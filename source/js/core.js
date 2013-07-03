@@ -1373,6 +1373,5 @@ zUI.ui.grid.reflash = function(options){
 zUI.ui.grid.selectAll = function(options){
 	var o = options || {},
 		g = this;
-
 };
 
