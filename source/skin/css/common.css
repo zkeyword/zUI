@@ -1,0 +1,45 @@
+/**
+* @Author:      norion
+* @Update:      2012.04.07
+* @Update by:   norion
+* @overview:    huizeUI
+*/
+#l-ui-wrap{}
+	.l-ui{position:absolute;}
+	.l-ui tr{line-height:normal}
+	
+.l-ui-lock{position:absolute;top:0;left:0;background:#000;z-index:9998;opacity:0.1}
+
+/*floatCenter*//*调用需要给ui-floatCenter重置高度、ui-floatCenter-item重置间距，否则就默认*/
+.ui-floatCenter{position:relative;width:100%;height:26px;overflow:hidden;z-index:999}
+	.ui-sl-floatCenter{float:left;position:relative;left:50%}
+		.ui-floatCenter-item{position:relative;right:50%;float:left;margin:0 5px}
+
+/*
+* @Author:      norion
+* @Update:      2012.4.15
+* @Update by:   norion
+* @overview:    公用按钮
+*/
+
+/*公用按钮*/
+.ui-btn{display:inline;float:left;font-size:14px;cursor:pointer;outline:none}
+	.ui-btn span,.ui-btn em{float:left;text-align:center;display:inline}
+	a:hover.ui-btn{text-decoration:none}
+	
+	/*大按钮*/
+	.ui-btnMax-floatCenter{height:43px;}/*调用ui-floatCenter*/
+		.ui-btnMax{height:43px;line-height:42px;font-size:16px;background:url(../images/ui-btn.png) no-repeat right -43px}
+			.ui-btnMax span{background:url(../images/ui-btn.png) no-repeat;padding:0 45px 0 40px;color:#fff}
+		.ui-btnMax-cancel{background-position:right -129px}
+			.ui-btnMax-cancel span{background-position:0 -86px;color:#666}
+		
+	/*主按钮*/
+	.ui-btnMain-floatCenter{height:26px;}/*调用ui-floatCenter*/
+		.ui-btnMain{height:26px;line-height:26px;background:url(../images/ui-btn.png) no-repeat 0 -172px;padding:0 0 0 2px}
+			.ui-btnMain span{min-width:70px;width:auto !important;width:70px;background:url(../images/ui-btn.png) no-repeat right -198px;padding:0 7px 0 5px;color:#fff}
+		.ui-btnMain-cancel{background-position:0 -224px}
+			.ui-btnMain-cancel span{background-position:right -250px;color:#666}
+	/*.ui-btnHover .ui-btnMain{background:url(../images/common/btn-bg.png) -39px -47px no-repeat}
+		.ui-btnMain em{text-align:center;line-height:24px;background:url(../images/common/btn-bg.png) right -23px no-repeat;padding:0 10px 0 8px}		
+		.ui-btnHover .ui-btnMain em{background:url(../images/common/btn-bg.png) right -117px no-repeat}		*/

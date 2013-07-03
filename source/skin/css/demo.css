@@ -1,0 +1,16 @@
+/**
+* @Author:      norion
+* @Update:      2012.04.25
+* @Update by:   norion
+* @overview:    demo
+*/
+#header{height:50px;margin:0 0 10px;background:#f1f1f1}
+	#header-main{width:980px;height:50px;margin:0 auto;background:url(../images/demo/logo.png) no-repeat center right;}
+#footer{height:50px;background:#f1f1f1;margin:10px 0 0}
+	#footer-main{width:980px;margin:0 auto;}
+#main{width:980px;margin:0 auto;}
+	#left{width:180px;padding:10px 10px 0;border:1px solid #f1f1f1}
+		#left dt{background:#f1f1f1;padding:10px;margin:0 0 10px}
+		#left dd{margin:0 0 10px;padding:0 0 0 20px}
+	#right{width:768px;border:1px solid #f1f1f1}
+		#demo{width:768px}
