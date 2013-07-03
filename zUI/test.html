@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+	<script type="text/javascript">
+		/*person*/
+		var person = function(email){
+			this.name = 'person';
+			this.email = email;
+		};
+		person.prototype.alert2 = function(){
+			//定义无用,不能影响person.prototype.alert的自
+			this.sss = 'ssss'
+		}
+		person.prototype.alert = function(yyy){
+			this.yyy = yyy
+			alert(this.name+":"+this.email+":"+this.sss+":"+this.yyy);
+		}
+		var sayPerson = new person('person@admin');
+		sayPerson.alert();
+		
+		/*initFn*/
+		var initFn = function(name,email){
+			this.name = name;
+			this.email = email;
+			alert('initFn');
+		}
+		var sayInitFn = new initFn('initFn','initFn@admin');
+		
+		/*call*/
+		//调用person对象的alert方法，以sayInitFn替换sayPerson。 
+		sayPerson.alert.call(sayInitFn,'yyy');
+		sayPerson.alert.apply(sayInitFn,['xxx']);
+		
+		//sayPerson.alert.apply(sayInitFn,args)，这个例子是讲sayInitFn对象“应用”sayPerson对象的alert方法。
+		
+	</script>
+</body>
+</html>
