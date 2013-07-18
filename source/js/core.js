@@ -950,9 +950,11 @@ zUI.ui.form = {
 		trigger.click(function(){
 			/*添加form数据域*/
 			var formHtml = '<input type="file" id="input-'+ name +'" name="' + name + '" />';
+			
 			for (key in params) {
 				formHtml += '<input type="hidden" name="' + key + '" value="' + params[key] + '" />';
 			}
+			
 			if( !$('#iframe_'+ name).length ){
 				$('body').append('<iframe style="position:absolute;top:-9999px" id="iframe_'+ name +'" name="iframe_'+ name +'"></iframe>');
 				$('body').append('<form method="post" style="display:none;" enctype="multipart/form-data" id="form_'+ name +'" name="form_'+ name +'" target="iframe_'+ name +'" action="'+ url +'"></form>');
@@ -1266,14 +1268,14 @@ zUI.app = {
 		var b = function(){
 			var i = document,
 			j = ipad ? window.pageYOffset : Math.max(i.documentElement.scrollTop, i.body.scrollTop);
-			if ( ipad ) {
+			if( ipad ){
 				d.defHeight = 0;
 			}
 			return i.documentElement.clientHeight + j - d.defHeight;
 		};
 		var f = function(j){
 			var i = j.attr("src2");
-			if (i) {
+			if(i){
 				j.css({
 					opacity : "0.3"
 				}).attr("src", i).removeAttr("src2").animate({
@@ -1301,80 +1303,112 @@ zUI.app = {
 
 var gridData = [
 	{"CustomerID":"ALFKI", "CompanyName":"1212 Futterkiste", "ContactName":"Maria 12", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"Berlin", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
 	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"}
 ];
 
+var gridData2 = [
+	{"CustomerID":"11111", "CompanyName":"1212 Futterkiste", "ContactName":"Maria 12", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"Berlin", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"a", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"}
+];
 
-zUI.ui.grid = {};
 
-zUI.ui.grid.init = function(options){
-	var o = options || {},
-		g = this;
-	if( !o.data ){ return false; }
-	var data    = o.data,
-		columns = o.columns || {},
-		wrap    = $(o.wrap),
-		id      = o.id || 'l-grid-' + (new Date()).valueOf()
-		html    = '<div class="l-gird" id="'+ id +'"></div>',
-		cls     = '';
-	
-	wrap.append(html)
-	var grid = $('#'+id);
-	
-	//表头
-	var tHeadHtml = '';
-	tHeadHtml += '<table>';
-	tHeadHtml += '<tr>';
-	for(var i = 0, l = columns.length; i < l; i++){
-		tHeadHtml += '<th>'+ columns[i].display +'</th>';
-	}
-	tHeadHtml += '</tr>';
-	tHeadHtml += '</table>';
-	grid.append(tHeadHtml);
-	
-	//内容
-	var tBodyHtml = '';
-	tBodyHtml += '<table>';
-	for(var j = 0,l = data.length; j < l; j++){
-		tBodyHtml += '<tr>';
-		for(var h=0; h < columns.length; h++){
-			if( columns[h].render !== undefined ){
-				var str = columns[h].render(data[j], j, data[j][columns[h].name]);
-				tBodyHtml += '<td>'+ str +'</td>';
-			}else{
-				tBodyHtml += '<td>'+ data[j][columns[h].name] +'</td>';
-			}
+zUI.ui.baseGrid = function(){
+	this.init = function(options){
+		var o = options || {},
+			g = this;
+		if( !o.data ){ return false; }
+		var data    = o.data,
+			columns = o.columns || {},
+			wrap    = $(o.wrap),
+			id      = o.id || 'l-grid-' + (new Date()).valueOf()
+			html    = '<div class="l-gird" id="'+ id +'"></div>',
+			cls     = '';
+		
+		wrap.append(html);
+		var grid = $('#'+id);
+		
+		//表头
+		var tHeadHtml = '';
+		tHeadHtml += '<div class="l-grid-header"><table>';
+		tHeadHtml += '<tr>';
+		for(var i = 0, l = columns.length; i < l; i++){
+			tHeadHtml += '<th>'+ columns[i].display +'</th>';
 		}
-		tBodyHtml += '</tr>';
+		tHeadHtml += '</tr>';
+		tHeadHtml += '</table></div>';
+		grid.append(tHeadHtml);
+		
+		//内容
+		var tBodyHtml = '';
+		tBodyHtml += '<div class="l-grid-body"><table>';
+		for(var j = 0,l = data.length; j < l; j++){
+			tBodyHtml += '<tr>';
+			for(var h=0; h < columns.length; h++){
+				if( columns[h].render !== undefined ){
+					var str = columns[h].render(data[j], j, data[j][columns[h].name]);
+					tBodyHtml += '<td>'+ str +'</td>';
+				}else{
+					tBodyHtml += '<td>'+ data[j][columns[h].name] +'</td>';
+				}
+			}
+			tBodyHtml += '</tr>';
+		}
+		tBodyHtml += '</table></div>';
+		grid.append(tBodyHtml);
+		
+		//固定栏
+		
+		//
+		
+		//底部
+		var tFootHtml = '';
+		
+		//共享对象
+		this.o = o,
+		this.id = id;
 	}
-	tBodyHtml += '</table>';
-	grid.append(tBodyHtml);
-	
-	//固定栏
-	
-	//
-	
-	//底部
-	var tFootHtml = '';
-};
+	this.reflash = function(data){
+		var o       = this.o
+			columns = o.columns || {},
+			wrap    = $(o.wrap),
+			id      = this.id,
+			html    = '<div class="l-gird" id="'+ id +'"></div>',
+			cls     = '';
+			
+		var grid     = $('#'+id),
+			gridBody = grid.find('.l-grid-body');
+		
+		//内容
+		var tBodyHtml = '';
+		tBodyHtml += '<table>';
+		for(var j = 0,l = data.length; j < l; j++){
+			tBodyHtml += '<tr>';
+			for(var h=0; h < columns.length; h++){
+				if( columns[h].render !== undefined ){
+					var str = columns[h].render(data[j], j, data[j][columns[h].name]);
+					tBodyHtml += '<td>'+ str +'</td>';
+				}else{
+					tBodyHtml += '<td>'+ data[j][columns[h].name] +'</td>';
+				}
+			}
+			tBodyHtml += '</tr>';
+		}
+		tBodyHtml += '</table>';
+		gridBody.html(tBodyHtml);
+	}
+}
 
-zUI.ui.grid.page = function(options){
-	var o = options || {},
-		g = this;
-	
-	
-	
-	
-};
-
-zUI.ui.grid.reflash = function(options){
-	var o = options || {},
-		g = this;
-	
-};
-
-zUI.ui.grid.selectAll = function(options){
-	var o = options || {},
-		g = this;
-};
+zUI.ui.grid = new zUI.ui.baseGrid();
 
