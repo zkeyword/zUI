@@ -19,6 +19,7 @@
 	<div id="wrap">
 		
 	</div>
+	<a href="#" id="reflash">ssss</a>
 </body>
 <script type="text/javascript">
 $(function(){
@@ -27,7 +28,6 @@ $(function(){
 		data: gridData,
 		columns: [
 			{ display: '表头0', name: 'CustomerID', width: 120, render: function(rdata, rindex, value){
-					console.log( rdata ) 
 					var h = '<span style="color:#ddd">'+ rdata + rindex + value +'</span>';
 					return h;
 				}
@@ -40,7 +40,12 @@ $(function(){
 			{ display: '表头6', name: 'Region', width: 100}
 		]
 	});
-		
+	
+	$('#reflash').click(function(){
+		zUI.ui.grid.reflash(gridData2)
+
+	});
+	
 });
 </script>
 </html>
