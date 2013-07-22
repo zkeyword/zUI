@@ -1302,39 +1302,132 @@ zUI.app = {
 };
 
 var gridData = [
-	{"CustomerID":"ALFKI", "CompanyName":"1212 Futterkiste", "ContactName":"Maria 12", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"Berlin", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"ALFK2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"}
+	{"CustomerID":"1", "CompanyName":"1212 Futterkiste", "ContactName":"Maria 12", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"Berlin", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"3", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"4", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"5", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"6", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"7", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"8", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"9", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"10", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"11", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"12", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"13", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"14", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"}
 ];
 
 var gridData2 = [
-	{"CustomerID":"11111", "CompanyName":"1212 Futterkiste", "ContactName":"Maria 12", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"Berlin", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"a", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"}
+	{"CustomerID":"1", "CompanyName":"1212 Futterkiste", "ContactName":"Maria 12", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"Berlin", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
+	{"CustomerID":"2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"}
 ];
 
 
 zUI.ui.baseGrid = function(){
+	var _core = {
+		
+		/**
+		* 表格主体内容
+		* @param {object}
+		* @param {object} 
+		* @param {number} 
+		*/
+		tBodyFn: function(columns, data, pageSize){
+			var tBodyHtml = '',
+				dataLen   = data.length,  //记录总数
+				size      = pageSize < dataLen ? pageSize : dataLen,
+				j         = pageSize;
+			
+			tBodyHtml += '<table>';
+			for(; j < dataLen; j++){
+				tBodyHtml += '<tr>';
+				for(var h=0; h < columns.length; h++){
+					if( columns[h].render !== undefined ){
+						var str = columns[h].render(data[j], j, data[j][columns[h].name]);
+						tBodyHtml += '<td>'+ str +'</td>';
+					}else{
+						tBodyHtml += '<td>'+ data[j][columns[h].name] +'</td>';
+					}
+				}
+				tBodyHtml += '</tr>';
+			}
+			tBodyHtml += '</table>';
+			return tBodyHtml;
+		},
+		
+		/**
+		* 内部分页函数
+		* @param {string} 分页容器
+		* @param {number} 记录总数
+		* @param {number} 显示条数
+		* @param {number} 当前页
+		* @param {function} 
+		*/
+		pagerFn: function (el, count, pageStep, pageNum, fnGo) {
+			this.getLink = function (fnGo, index, pageNum, text) {
+				var s = '<a href="#p' + index + '" onclick="' + fnGo + '(' + index + ');" ';
+				if (index == pageNum) {
+					s += 'class="aCur" ';
+				}
+				text = text || index;
+				s += '>' + text + '</a> ';
+				return s;
+			}
+
+			//总页数
+			var pageNumAll = Math.ceil(count / pageStep);
+			if(pageNumAll == 1){
+				$(el).html('');
+				return;
+			}
+			var itemNum = 5; //当前页左右两边显示个数
+			pageNum = Math.max(pageNum, 1);
+			pageNum = Math.min(pageNum, pageNumAll);
+			var s = '';
+			if(pageNum > 1){
+				s += this.getLink(fnGo, pageNum - 1, pageNum, '上一页');
+			}else{
+				s += '<span>上一页</span> ';
+			}
+			var begin = 1;
+			if(pageNum - itemNum > 1){
+				s += this.getLink(fnGo, 1, pageNum) + '... ';
+				begin = pageNum - itemNum;
+			}
+			var end = Math.min(pageNumAll, begin + itemNum * 2);
+			if(end == pageNumAll - 1){
+				end = pageNumAll;
+			}
+			for(var i = begin; i <= end; i++) {
+				s += this.getLink(fnGo, i, pageNum);
+			}
+			if(end < pageNumAll){
+				s += '... ' + this.getLink(fnGo, pageNumAll, pageNum);
+			}
+			if(pageNum < pageNumAll){
+				s += this.getLink(fnGo, pageNum + 1, pageNum, '下一页');
+			}else{
+				s += '<span>下一页</span> ';
+			}
+			$(el).html(s);
+		}
+	}
+	
+	/*表格初始化*/
 	this.init = function(options){
 		var o = options || {},
 			g = this;
 		if( !o.data ){ return false; }
-		var data    = o.data,
-			columns = o.columns || {},
-			wrap    = $(o.wrap),
-			id      = o.id || 'l-grid-' + (new Date()).valueOf()
-			html    = '<div class="l-gird" id="'+ id +'"></div>',
-			cls     = '';
+		var data      = o.data,                                     //json数据源
+			columns   = o.columns || {},                            //表格列信息
+			wrap      = $(o.wrap),                                  //收纳表格的容器
+			id        = o.id || 'l-grid-' + (new Date()).valueOf()  //表格ID
+			html      = '<div class="l-gird" id="'+ id +'"></div>',   
+			cls       = '',                                         //自定义class
+			isPager   = o.isPager || true,                          //是否分页
+			pageIndex = 1,                                          //默认当前页
+			pageSize  = 10;                                         //每页默认的结果数
 		
 		wrap.append(html);
 		var grid = $('#'+id);
@@ -1351,61 +1444,49 @@ zUI.ui.baseGrid = function(){
 		grid.append(tHeadHtml);
 		
 		//内容
-		var tBodyHtml = '';
-		tBodyHtml += '<div class="l-grid-body"><table>';
-		for(var j = 0,l = data.length; j < l; j++){
-			tBodyHtml += '<tr>';
-			for(var h=0; h < columns.length; h++){
-				if( columns[h].render !== undefined ){
-					var str = columns[h].render(data[j], j, data[j][columns[h].name]);
-					tBodyHtml += '<td>'+ str +'</td>';
-				}else{
-					tBodyHtml += '<td>'+ data[j][columns[h].name] +'</td>';
-				}
-			}
-			tBodyHtml += '</tr>';
-		}
-		tBodyHtml += '</table></div>';
-		grid.append(tBodyHtml);
+		var tBodyHtml = _core.tBodyFn(columns, data, pageSize);
+		grid.append('<div class="l-grid-body">'+ tBodyHtml +'</div>');
 		
 		//固定栏
-		
-		//
-		
+				
 		//底部
-		var tFootHtml = '';
-		
+			//底部结构
+			var tFootHtml = '';
+			tFootHtml += '<div class="l-grid-footer">';
+			tFootHtml += '<div class="l-grid-footer-message">显示从1到20，总 30 条 。每页显示：'+ pageSize +'</div>';
+			tFootHtml += '<div class="l-grid-footer-btns"></div>';
+			if( isPager ){
+				tFootHtml += '<div class="l-grid-footer-pager"></div>';
+			}
+			tFootHtml += '<div>';
+			grid.append(tFootHtml);
+			
+			//分页
+			if( grid.find('.l-grid-footer-pager') ){
+				_core.pagerFn('.l-grid-footer-pager', data.length, pageSize, pageIndex, 'goPage');
+			}
+
 		//共享对象
 		this.o = o,
-		this.id = id;
-	}
+		this.id = id,
+		this.pageSize = pageSize;
+	};
+	
+	/*表格刷新数据源*/
 	this.reflash = function(data){
-		var o       = this.o
-			columns = o.columns || {},
-			wrap    = $(o.wrap),
-			id      = this.id,
-			html    = '<div class="l-gird" id="'+ id +'"></div>',
-			cls     = '';
+		var o        = this.o
+			columns  = o.columns || {},
+			wrap     = $(o.wrap),
+			id       = this.id,
+			pageSize = this.pageSize,
+			html     = '<div class="l-gird" id="'+ id +'"></div>',
+			cls      = '';
 			
 		var grid     = $('#'+id),
 			gridBody = grid.find('.l-grid-body');
 		
 		//内容
-		var tBodyHtml = '';
-		tBodyHtml += '<table>';
-		for(var j = 0,l = data.length; j < l; j++){
-			tBodyHtml += '<tr>';
-			for(var h=0; h < columns.length; h++){
-				if( columns[h].render !== undefined ){
-					var str = columns[h].render(data[j], j, data[j][columns[h].name]);
-					tBodyHtml += '<td>'+ str +'</td>';
-				}else{
-					tBodyHtml += '<td>'+ data[j][columns[h].name] +'</td>';
-				}
-			}
-			tBodyHtml += '</tr>';
-		}
-		tBodyHtml += '</table>';
+		var tBodyHtml = _core.tBodyFn(columns, data, pageSize);
 		gridBody.html(tBodyHtml);
 	}
 }

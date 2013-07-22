@@ -1,0 +1,15 @@
+@charset "utf-8";
+/**
+* @Author:      norion
+* @Update:      2013.07.19
+* @Update by:   norion
+* @overview:    表格
+*/
+/*表格头部*/
+.l-grid-header table{border-collapse:collapse;border-spacing:0px;border:1px solid #ddd;font-size:14px;color:#333;background-color:#fff;}
+	.l-grid-header th{border:1px solid #ddd;border-bottom:none;padding:5px 8px;background:#eef}
+	
+/*表格内容*/
+.l-grid-body table{border-collapse:collapse;border-spacing:0px;border:1px solid #ddd;font-size:14px;color:#333;background-color:#fff}
+	.l-grid-body td{border:solid 1px #ddd;padding:5px 8px;}
+/*表格尾部*/
