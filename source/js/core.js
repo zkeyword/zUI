@@ -1,3 +1,5 @@
+'use strict';
+
 (function() {
 	/*针对原型的方法添加应用支持*/
 	String.prototype.getLength = function(){
@@ -591,18 +593,20 @@ zUI.ui.pop = {
 		}
 		/*esc退出*/
 		if( allowEscClose ){
-			if(document.attachEvent){
-				document.attachEvent('onkeydown', modalKey);
-			}else{
-				document.addEventListener('keydown', modalKey, true);
-			}
-			function modalKey(e){
+			var _modalKey = function(e){
 				e = e || event;
 				var code = e.which || event.keyCode;
 				if(code == 27){
 					zUI.ui.pop.close(id);
 				}
+			};
+			
+			if(document.attachEvent){
+				document.attachEvent('onkeydown', _modalKey);
+			}else{
+				document.addEventListener('keydown', _modalKey, true);
 			}
+			
 		}
 	},
 	
@@ -788,17 +792,18 @@ zUI.ui.dialog = {
 		
 		/*esc退出*/
 		if( allowEscClose ){
-			if(document.attachEvent){
-				document.attachEvent('onkeydown', modalKey);
-			}else{
-				document.addEventListener('keydown', modalKey, true);
-			}
-			function modalKey(e){
+			var _modalKey = function (e){
 				e = e || event;
 				var code = e.which || event.keyCode;
 				if(code == 27){
 					zUI.ui.dialog.close(id);
 				}
+			};
+			
+			if(document.attachEvent){
+				document.attachEvent('onkeydown', _modalKey);
+			}else{
+				document.addEventListener('keydown', _modalKey, true);
 			}
 		}
 	},
@@ -1301,193 +1306,270 @@ zUI.app = {
 	}
 };
 
-var gridData = [
-	{"CustomerID":"1", "CompanyName":"1212 Futterkiste", "ContactName":"Maria 12", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"Berlin", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"3", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"4", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"5", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"6", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"7", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"8", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"9", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"10", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"11", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"12", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"13", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"14", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"}
-];
-
-var gridData2 = [
-	{"CustomerID":"1", "CompanyName":"1212 Futterkiste", "ContactName":"Maria 12", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"Berlin", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"},
-	{"CustomerID":"2", "CompanyName":"Alfreds Futterkiste", "ContactName":"Maria Anders", "ContactTitle":"Sales Representative", "Address":"Obere Str. 57", "City":"111", "Region":null, "PostalCode":"12209", "Country":"Germany", "Phone":"030-0074321", "Fax":"030-0076545"}
-];
-
-
+/**
+ * @name grid插件
+ * @author norion
+ * @blog http://zkeyword.com/
+ * @update 2013.07.24
+ * @param {object} options
+ * @example 
+	zUI.ui.grid.init({
+		wrap:'#wrap',
+		data: AllOrdersData,
+		columns: [
+			{ display: '表头0', name: 'OrderID', width: 120, render: function(rdata, rindex, value){
+					var h = '<span style="color:#ddd">'+ value +'</span>';
+					return h;
+				}
+			},
+			{ display: '表头1', name: 'CustomerID', width: 100},
+			{ display: '表头2', name: 'EmployeeID', width: 100},
+			{ display: '表头3', name: 'ShipCity', width: 100},
+			{ display: '表头4', name: 'ShipRegion', width: 100},
+			{ display: '表头5', name: 'ShippedDate', width: 100},
+			{ display: '表头6', name: 'ShipName', width: 100}
+		]
+	});
+	
+	$('#reflash').click(function(){
+		zUI.ui.grid.reflash(gridData2)
+	});
+ */
 zUI.ui.baseGrid = function(){
-	var _core = {
-		
-		/**
-		* 表格主体内容
-		* @param {object}
-		* @param {object} 
-		* @param {number} 
-		*/
-		tBodyFn: function(columns, data, pageSize){
-			var tBodyHtml = '',
-				dataLen   = data.length,  //记录总数
-				size      = pageSize < dataLen ? pageSize : dataLen,
-				j         = pageSize;
-			
-			tBodyHtml += '<table>';
-			for(; j < dataLen; j++){
-				tBodyHtml += '<tr>';
-				for(var h=0; h < columns.length; h++){
-					if( columns[h].render !== undefined ){
-						var str = columns[h].render(data[j], j, data[j][columns[h].name]);
-						tBodyHtml += '<td>'+ str +'</td>';
-					}else{
-						tBodyHtml += '<td>'+ data[j][columns[h].name] +'</td>';
-					}
-				}
-				tBodyHtml += '</tr>';
-			}
-			tBodyHtml += '</table>';
-			return tBodyHtml;
-		},
-		
-		/**
-		* 内部分页函数
-		* @param {string} 分页容器
-		* @param {number} 记录总数
-		* @param {number} 显示条数
-		* @param {number} 当前页
-		* @param {function} 
-		*/
-		pagerFn: function (el, count, pageStep, pageNum, fnGo) {
-			this.getLink = function (fnGo, index, pageNum, text) {
-				var s = '<a href="#p' + index + '" onclick="' + fnGo + '(' + index + ');" ';
-				if (index == pageNum) {
-					s += 'class="aCur" ';
-				}
-				text = text || index;
-				s += '>' + text + '</a> ';
-				return s;
-			}
 
-			//总页数
-			var pageNumAll = Math.ceil(count / pageStep);
-			if(pageNumAll == 1){
-				$(el).html('');
-				return;
+	var g     = this,
+		_core = {
+			/**
+			* 表格主体内容
+			* @param {object}
+			* @param {object} 
+			* @param {number} 
+			*/
+			tBodyFn: function(options){
+				var columns   = options.columns,
+					data      = options.data.Rows,
+					pageSize  = options.pageSize,
+					pageIndex = options.pageIndex,
+					tBodyHtml = '',
+					dataLen   = options.data.Total,                    //记录总数
+					pageStar  = (pageIndex-1)*pageSize,                //当前记录的起始
+					pageEnd   = Math.min(pageIndex*pageSize, dataLen); //当前记录的结束
+
+				tBodyHtml += '<table>';
+				for(; pageStar < pageEnd; pageStar++){
+					tBodyHtml += '<tr>';
+					for(var h = 0; h < columns.length; h++){
+						if( columns[h].render !== undefined ){
+							var str = columns[h].render(data[pageStar], pageStar, data[pageStar][columns[h].name]);
+							tBodyHtml += '<td>'+ str +'</td>';
+						}else{
+							tBodyHtml += '<td>'+ data[pageStar][columns[h].name] +'</td>';
+						}
+					}
+					tBodyHtml += '</tr>';
+				}
+				tBodyHtml += '</table>';
+				return tBodyHtml;
+			},
+			
+			/**
+			* 内部分页函数
+			* @param {object} init 和 refalse共享的对象
+			*/
+			pagerFn: function (options) {
+				var columns    = options.columns,                   //表格columns
+					id         = options.id,                        //表格ID
+					pageSize   = options.pageSize,                  //每页显示多少个
+					pageIndex  = options.pageIndex,                 //起始位置
+					data       = options.data.Rows,                 //表格数据
+					count      = options.data.Total,                //记录总个数
+					itemNum    = 2,                                 //当前页两边显示个数
+					html       = '',
+					grid       = $('#'+id),
+					pager      = grid.find('.l-grid-footer-pager'), //分页容器
+					/**
+					* 获取数字连接
+					* @param {Number} 当前位置
+					* @param {Number} 
+					* @param {String} 上下翻页的文本
+					*/
+					_getLink   = function(index, pageNum, txt){
+						var s       = '',
+							current = txt ? (index == pageNum ? ' class="on"' : '') : '',
+							txt     = txt || index;
+							
+						s += '<a href="#p'+ index +'" page="'+ index +'"' 
+							 + current + '>'+ txt +'</a>';
+						return s;
+					},
+					/**
+					* 获取显示的数据
+					* @param {Number} 每页显示条数
+					* @param {Number} 数据长度
+					* @param {Number} 当前位置
+					*/
+					_getCount  = function(pageSize, count, index){
+						var s = '';
+						
+						s += '显示从'+ ( (index-1)*pageSize + 1 ) +'到'+ index*pageSize;
+						s += '，总 '+ count +' 条 。每页显示：'+ pageSize;
+						return s;
+					},
+					/**
+					* 获取分页按钮
+					* @param {Number} 每页显示条数
+					* @param {Number} 数据长度
+					* @param {Number} 当前位置
+					*/
+					_getBtn = function(pageSize, count, index){
+						var s       = '',
+							begin   = 1,
+							end     = 1,
+							i       = 0,
+							pageNum = Math.ceil(count / pageSize);
+							
+						if(index > 1){
+							s += _getLink(index - 1, itemNum, '上一页');
+						}else{
+							s += '<span>上一页</span>';
+						}
+						if(index - itemNum > 1){
+							s += _getLink(1, index) + '<em>...</em>';
+							begin = index - itemNum;
+						}
+						end = Math.min(pageNum, begin + itemNum * 2);
+						if(end == pageNum - 1){
+							end = pageNum;
+						}
+						for(i = begin; i <= end; i++) {
+							s += _getLink(i, index);
+						}
+						if(end < pageNum){
+							s += '<em>...</em>' + _getLink(pageNum, index);
+						}
+						if(index < pageNum){
+							s += _getLink(index + 1, index, '下一页');
+						}else{
+							s += '<span>下一页</span> ';
+						}
+						return s;
+					};
+				
+				/*分页按钮*/
+				html += '<div class="l-grid-footer-pager-btn">'+ _getBtn(pageSize, count, pageIndex) +'</div>';				
+								
+				/*分页统计*/
+				html += '<div class="l-grid-footer-pager-msg">'+ _getCount(pageSize, count, pageIndex) +'</div>';
+				
+				/*生成分页*/
+				pager.html(html);
+				
+				/*分页事件*/
+				pager.find('.l-grid-footer-pager-btn a').live('click',function(){
+					var gridBody    = grid.find('.l-grid-body'),
+						gridpageMsg = pager.find('.l-grid-footer-pager-msg'),
+						gridpageBtn = pager.find('.l-grid-footer-pager-btn'),
+						index       = Number( $(this).attr('page') ); // attr返回 string
+														
+					/*修改 options 对象中的 pageIndex 成员*/
+					options.pageIndex = index;
+					
+					/*重载html*/
+					gridBody.html(_core.tBodyFn(options));
+					gridpageMsg.html( _getCount(pageSize, count, index) );
+					gridpageBtn.html( _getBtn(pageSize, count, index) );
+				});
 			}
-			var itemNum = 5; //当前页左右两边显示个数
-			pageNum = Math.max(pageNum, 1);
-			pageNum = Math.min(pageNum, pageNumAll);
-			var s = '';
-			if(pageNum > 1){
-				s += this.getLink(fnGo, pageNum - 1, pageNum, '上一页');
-			}else{
-				s += '<span>上一页</span> ';
-			}
-			var begin = 1;
-			if(pageNum - itemNum > 1){
-				s += this.getLink(fnGo, 1, pageNum) + '... ';
-				begin = pageNum - itemNum;
-			}
-			var end = Math.min(pageNumAll, begin + itemNum * 2);
-			if(end == pageNumAll - 1){
-				end = pageNumAll;
-			}
-			for(var i = begin; i <= end; i++) {
-				s += this.getLink(fnGo, i, pageNum);
-			}
-			if(end < pageNumAll){
-				s += '... ' + this.getLink(fnGo, pageNumAll, pageNum);
-			}
-			if(pageNum < pageNumAll){
-				s += this.getLink(fnGo, pageNum + 1, pageNum, '下一页');
-			}else{
-				s += '<span>下一页</span> ';
-			}
-			$(el).html(s);
 		}
-	}
 	
 	/*表格初始化*/
-	this.init = function(options){
-		var o = options || {},
-			g = this;
-		if( !o.data ){ return false; }
-		var data      = o.data,                                     //json数据源
-			columns   = o.columns || {},                            //表格列信息
-			wrap      = $(o.wrap),                                  //收纳表格的容器
-			id        = o.id || 'l-grid-' + (new Date()).valueOf()  //表格ID
-			html      = '<div class="l-gird" id="'+ id +'"></div>',   
-			cls       = '',                                         //自定义class
-			isPager   = o.isPager || true,                          //是否分页
-			pageIndex = 1,                                          //默认当前页
-			pageSize  = 10;                                         //每页默认的结果数
+	g.init = function(o){
+		if(!o){return false;}
+		var options = {
+				data:      o.data,                                     //json数据源
+				columns:   o.columns || {},                            //表格列信息
+				wrap:      $(o.wrap),                                  //收纳表格的容器
+				id:        o.id || 'l-grid-' + (new Date()).valueOf(), //表格ID
+				isPager:   o.isPager ? false : true,                   //是否分页
+				pageIndex: o.pageIndex || 1,                           //默认当前页
+				pageSize:  o.pageSize || 10,                           //每页显示条数
+				checkbox:  o.checkbox ? true : false,
+				width:     o.width || 'auto'
+			};
 		
-		wrap.append(html);
-		var grid = $('#'+id);
+		/*复制对象，共享成员给 g*/
+		g.o = {};		
+		for(var key in options){
+			g.o[key] = options[key];
+		}
 		
-		//表头
+		/*插入容器*/
+		options.wrap.append('<div class="l-gird" id="'+ options.id +'"></div>');
+		var grid = $('#' + options.id);
+		
+		/*表头*/
 		var tHeadHtml = '';
 		tHeadHtml += '<div class="l-grid-header"><table>';
 		tHeadHtml += '<tr>';
-		for(var i = 0, l = columns.length; i < l; i++){
-			tHeadHtml += '<th>'+ columns[i].display +'</th>';
+		for(var i = 0, l = options.columns.length; i < l; i++){
+			tHeadHtml += '<th>'+ options.columns[i].display +'</th>';
 		}
 		tHeadHtml += '</tr>';
 		tHeadHtml += '</table></div>';
 		grid.append(tHeadHtml);
 		
-		//内容
-		var tBodyHtml = _core.tBodyFn(columns, data, pageSize);
+		/*内容*/
+		var tBodyHtml = _core.tBodyFn(options);
 		grid.append('<div class="l-grid-body">'+ tBodyHtml +'</div>');
+						
+		/*底部*/
 		
-		//固定栏
-				
-		//底部
-			//底部结构
+			/*底部结构*/
 			var tFootHtml = '';
 			tFootHtml += '<div class="l-grid-footer">';
-			tFootHtml += '<div class="l-grid-footer-message">显示从1到20，总 30 条 。每页显示：'+ pageSize +'</div>';
-			tFootHtml += '<div class="l-grid-footer-btns"></div>';
-			if( isPager ){
+			if( options.isBottomBtns ){ // 是否有底部按钮
+				tFootHtml += '<div class="l-grid-footer-btns"></div>';
+			}
+			if( options.isPager ){ // 是否显示分页
 				tFootHtml += '<div class="l-grid-footer-pager"></div>';
 			}
-			tFootHtml += '<div>';
+			tFootHtml += '</div>';
 			grid.append(tFootHtml);
 			
-			//分页
-			if( grid.find('.l-grid-footer-pager') ){
-				_core.pagerFn('.l-grid-footer-pager', data.length, pageSize, pageIndex, 'goPage');
+			/*按钮*/
+			if( grid.find('.l-grid-footer-btns') ){
+				
 			}
-
-		//共享对象
-		this.o = o,
-		this.id = id,
-		this.pageSize = pageSize;
+			
+			/*分页*/
+			if( grid.find('.l-grid-footer-pager') ){
+				_core.pagerFn(options);
+			}
 	};
 	
 	/*表格刷新数据源*/
-	this.reflash = function(data){
-		var o        = this.o
-			columns  = o.columns || {},
-			wrap     = $(o.wrap),
-			id       = this.id,
-			pageSize = this.pageSize,
-			html     = '<div class="l-gird" id="'+ id +'"></div>',
-			cls      = '';
-			
+	g.reflash = function(data){
+		var o         = g.o,
+			columns   = o.columns || {},
+			wrap      = $(o.wrap),
+			id        = o.id,
+			pageSize  = o.pageSize,
+			pageIndex = o.pageIndex;
+				
 		var grid     = $('#'+id),
 			gridBody = grid.find('.l-grid-body');
 		
+		/*修改 o 对象的 data 成员*/
+		o.data = data;
+		
 		//内容
-		var tBodyHtml = _core.tBodyFn(columns, data, pageSize);
+		var tBodyHtml = _core.tBodyFn(o);
 		gridBody.html(tBodyHtml);
+		
+		//分页
+		if( grid.find('.l-grid-footer-pager') ){
+			_core.pagerFn(o);
+		}
 	}
 }
 
