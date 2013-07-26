@@ -1340,10 +1340,8 @@ zUI.ui.baseGrid = function(){
 	var g     = this,
 		_core = {
 			/**
-			* 表格主体内容
-			* @param {object}
-			* @param {object} 
-			* @param {number} 
+			* 内部表格主体内容
+			* @param {object} init 和 refalse共享的对象
 			*/
 			tBodyFn: function(options){
 				var columns   = options.columns,
@@ -1353,17 +1351,21 @@ zUI.ui.baseGrid = function(){
 					tBodyHtml = '',
 					dataLen   = options.data.Total,                    //记录总数
 					pageStar  = (pageIndex-1)*pageSize,                //当前记录的起始
-					pageEnd   = Math.min(pageIndex*pageSize, dataLen); //当前记录的结束
+					pageEnd   = Math.min(pageIndex*pageSize, dataLen), //当前记录的结束
+					checkbox  = options.checkbox;
 
 				tBodyHtml += '<table>';
 				for(; pageStar < pageEnd; pageStar++){
 					tBodyHtml += '<tr>';
+					if( checkbox ){
+						tBodyHtml += '<td style="width:36px"><span class="l-grid-row-cell-btn-checkbox"></span></td>';
+					}
 					for(var h = 0; h < columns.length; h++){
 						if( columns[h].render !== undefined ){
 							var str = columns[h].render(data[pageStar], pageStar, data[pageStar][columns[h].name]);
-							tBodyHtml += '<td>'+ str +'</td>';
+							tBodyHtml += '<td style="width:'+ columns[h].width +'px">'+ str +'</td>';
 						}else{
-							tBodyHtml += '<td>'+ data[pageStar][columns[h].name] +'</td>';
+							tBodyHtml += '<td style="width:'+ columns[h].width +'px">'+ data[pageStar][columns[h].name] +'</td>';
 						}
 					}
 					tBodyHtml += '</tr>';
@@ -1455,12 +1457,12 @@ zUI.ui.baseGrid = function(){
 						}
 						return s;
 					};
-				
-				/*分页按钮*/
-				html += '<div class="l-grid-footer-pager-btn">'+ _getBtn(pageSize, count, pageIndex) +'</div>';				
 								
 				/*分页统计*/
 				html += '<div class="l-grid-footer-pager-msg">'+ _getCount(pageSize, count, pageIndex) +'</div>';
+				
+				/*分页按钮*/
+				html += '<div class="l-grid-footer-pager-btn">'+ _getBtn(pageSize, count, pageIndex) +'</div>';				
 				
 				/*生成分页*/
 				pager.html(html);
@@ -1485,6 +1487,30 @@ zUI.ui.baseGrid = function(){
 						onPageFn(index, pageSize);
 					}
 				});
+			},
+			
+			/**
+			* 内部获取行数据
+			* @param {object} init 和 refalse共享的对象
+			* @param {Number} 当前页
+			* @param {Number} 当前页索引
+			*/
+			getRowData: function(options, index){
+				var	data      = options.data.Rows,  //表格数据
+					pageSize  = options.pageSize,   //每页显示的长度
+					pageIndex = options.pageIndex   //当前页
+					
+				if( index === -1 ){
+					return false;
+				}
+				
+				index = index - 1; //$(obj).index() 传过来是1开始
+				
+				if( pageIndex == 1 ){
+					return data[index];
+				}		
+				
+				return data[ (pageIndex-1)*pageSize + index ];
 			}
 		}
 	
@@ -1492,18 +1518,19 @@ zUI.ui.baseGrid = function(){
 	g.init = function(o){
 		if(!o){return false;}
 		var options = {
-				data:      o.data,                                     //json数据源
-				columns:   o.columns || {},                            //表格列信息
-				wrap:      $(o.wrap),                                  //收纳表格的容器
-				id:        o.id || 'l-grid-' + (new Date()).valueOf(), //表格ID
-				isPager:   o.isPager ? false : true,                   //是否分页
-				pageIndex: o.pageIndex || 1,                           //默认当前页
-				pageSize:  o.pageSize || 10,                           //每页显示条数
-				checkbox:  o.checkbox ? true : false,
-				width:     o.width || 'auto',
-				onPageFn:  o.onPageFn
+				data:       o.data,                                     //json数据源
+				columns:    o.columns || {},                            //表格列信息
+				wrap:       $(o.wrap),                                  //收纳表格的容器
+				id:         o.id || 'l-grid-' + (new Date()).valueOf(), //表格ID
+				bottomBtns: o.bottomBtns || {},                         //底部按钮
+				isPager:    o.isPager ? false : true,                   //是否分页
+				pageIndex:  o.pageIndex || 1,                           //默认当前页
+				pageSize:   o.pageSize || 10,                           //每页显示条数
+				onPageFn:   o.onPageFn,                                 //点击分页加载的事件
+				checkbox:   o.checkbox ? true : false,                  //是否有checkbox
+				width:      o.width || 'auto'
 			};
-		
+					
 		/*复制对象，共享成员给 g*/
 		g.o = {};		
 		for(var key in options){
@@ -1518,8 +1545,11 @@ zUI.ui.baseGrid = function(){
 		var tHeadHtml = '';
 		tHeadHtml += '<div class="l-grid-header"><table>';
 		tHeadHtml += '<tr>';
+		if( options.checkbox ){
+			tHeadHtml += '<th style="width:36px"><span class="l-grid-row-cell-btn-checkbox"></span></th>';
+		}
 		for(var i = 0, l = options.columns.length; i < l; i++){
-			tHeadHtml += '<th>'+ options.columns[i].display +'</th>';
+			tHeadHtml += '<th style="width:'+ options.columns[i].width +'px">'+ options.columns[i].display +'</th>';
 		}
 		tHeadHtml += '</tr>';
 		tHeadHtml += '</table></div>';
@@ -1534,7 +1564,7 @@ zUI.ui.baseGrid = function(){
 			/*底部结构*/
 			var tFootHtml = '';
 			tFootHtml += '<div class="l-grid-footer">';
-			if( options.isBottomBtns ){ // 是否有底部按钮
+			if( options.bottomBtns.length ){ // 是否有底部按钮
 				tFootHtml += '<div class="l-grid-footer-btns"></div>';
 			}
 			if( options.isPager ){ // 是否显示分页
@@ -1552,6 +1582,20 @@ zUI.ui.baseGrid = function(){
 			if( grid.find('.l-grid-footer-pager') ){
 				_core.pagerFn(options);
 			}
+		
+		var onAfterShowData = function(txt){
+			alert(txt)
+		}
+		
+		/*事件*/
+		grid.find('tr').trigger('onAfterShowData', ['a']);
+		/* grid.find('tr').live('click',function(){
+			var self  = $(this),
+				index = grid.find('tr').index(self),
+				msg   = _core.getRowData(options, index);
+			
+			return msg;
+		}); */
 	};
 	
 	/*表格刷新数据源*/

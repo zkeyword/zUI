@@ -21,29 +21,52 @@
 <script src="js/jquery-1.3.2.min.js" type="text/javascript"></script>
 <script src="js/core.js" type="text/javascript"></script>
 <script src="js/AllOrdersData.js" type="text/javascript"></script>
+<script src="js/CustomersData2.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(function(){
-	zUI.ui.grid.init({
-		wrap:'#wrap',
+	var girds = zUI.ui.grid.init({
+		wrap: '#wrap',
 		data: AllOrdersData,
+		checkbox: true,
+		bottomBtns: [
+			{
+				id: 'CustomerID',
+				text:'保存',
+				onclick: function(){
+					alert('s')
+				}
+			},
+			{
+				id: 'CustomerID2',
+				text:'取消',
+				onclick: function(){
+					alert('s')
+				}
+			}
+		],
 		columns: [
-			{ display: '表头0', name: 'OrderID', width: 120, render: function(rdata, rindex, value){
+			{ display: '表头0', name: 'OrderID', width: 50, render: function(rdata, rindex, value){
 					var h = '<span style="color:#ddd">'+ value +'</span>';
 					return h;
 				}
 			},
-			{ display: '表头1', name: 'CustomerID', width: 100},
-			{ display: '表头2', name: 'EmployeeID', width: 100},
-			{ display: '表头3', name: 'ShipCity', width: 100},
-			{ display: '表头4', name: 'ShipRegion', width: 100},
-			{ display: '表头5', name: 'ShippedDate', width: 100},
-			{ display: '表头6', name: 'ShipName', width: 100}
-		]
+			{ display: '表头1', name: 'CustomerID', width: 80},
+			{ display: '表头2', name: 'EmployeeID', width: 40},
+			{ display: '表头3', name: 'ShipCity', width: 80},
+			{ display: '表头4', name: 'ShipRegion', width: 50},
+			{ display: '表头5', name: 'ShippedDate', width: 400},
+			{ display: '表头6', name: 'ShipName', width: 200}
+		],
+		onPageFn: function(index, pageSize){
+			//zUI.ui.grid.reflash(CustomersData, index)  //重新查找data
+		}
 	});
 	
 	$('#reflash').click(function(){
-		zUI.ui.grid.reflash(gridData2)
+		zUI.ui.grid.reflash(CustomersData)
 	});
+	
+	console.log( girds )
 	
 });
 </script>
