@@ -1531,7 +1531,7 @@ zUI.ui.baseGrid = function(){
 				width:      o.width || 'auto'
 			};
 					
-		/*复制对象，共享成员给 g*/
+		/*给g添加一个对象o，并复制options共享该对象*/
 		g.o = {};		
 		for(var key in options){
 			g.o[key] = options[key];
@@ -1582,20 +1582,19 @@ zUI.ui.baseGrid = function(){
 			if( grid.find('.l-grid-footer-pager') ){
 				_core.pagerFn(options);
 			}
-		
-		var onAfterShowData = function(txt){
-			alert(txt)
-		}
-		
+			
 		/*事件*/
-		grid.find('tr').trigger('onAfterShowData', ['a']);
-		/* grid.find('tr').live('click',function(){
+		grid.find('tr').live('click',function(){
 			var self  = $(this),
 				index = grid.find('tr').index(self),
 				msg   = _core.getRowData(options, index);
 			
+			alert( msg )
+			
 			return msg;
-		}); */
+		});
+		
+		return g;
 	};
 	
 	/*表格刷新数据源*/
