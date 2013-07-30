@@ -6,6 +6,11 @@
 * @overview:    表格
 */
 
+/*公共部分*/
+	/*选择框*/
+	.l-grid-hd-checkbox{display:block;width:10px;height:10px;background:#000;}
+	.l-grid-row-checkbox{display:block;width:10px;height:10px;background:#000;}
+
 /*表格头部*/
 .l-grid-header table{border-collapse:collapse;border-spacing:0;border:1px solid #ddd;font-size:14px;color:#333;background-color:#fff;}
 	.l-grid-header th{border:1px solid #ddd;border-bottom:none;padding:5px 8px;background:#eef}

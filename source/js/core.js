@@ -2,12 +2,17 @@
 
 (function() {
 	/*针对原型的方法添加应用支持*/
+	
+	//获取中文长度
 	String.prototype.getLength = function(){
 		return this.replace(/[^\x00-\xff]/g,"en").length; //若为中文替换成两个字母
 	};
+	
+	//清空空格
 	String.prototype.trim = function(){
 		return this.replace(/^[\s\xa0\u3000]+|[\u3000\xa0\s]+$/g, "");
 	};
+	
 	//unicode互转
 	String.prototype.toUnicode = function(){
 		return escape( this.toLocaleLowerCase().replace(/%u/gi, '\\') );
@@ -178,7 +183,7 @@ zUI.ui.drag = function(options){
 		dragWrap = $('body').find(o.dragWrap),
 		win      = parent.document || document,
 		mouse    = {x:0,y:0};
-	function moveDialog(event){
+	function _moveDialog(event){
         var e    = window.event || event,
         	top  = parseInt(dragWrap.css('top')) + (e.clientY - mouse.y),
         	left = parseInt(dragWrap.css('left')) + (e.clientX - mouse.x);
@@ -190,10 +195,10 @@ zUI.ui.drag = function(options){
         var e = window.event || event;
         mouse.x = e.clientX;
         mouse.y = e.clientY;
-        $(win).bind('mousemove',moveDialog);
+        $(win).bind('mousemove',_moveDialog);
     });
     $(win).mouseup(function(event){
-        $(win).unbind('mousemove', moveDialog);
+        $(win).unbind('mousemove', _moveDialog);
     });
 };
 
@@ -232,13 +237,13 @@ zUI.ui.tab = function(options){
 		init: function(){
 			$(tabWrap).eq(tabIndex).show().siblings(tabWrap).hide();
 			if( tabWrap != null ){
-				var _index  = tabIndex;
+				var index = tabIndex;
 				$(tabItem).bind(tabEvent,function(){
-					_index  =  $(tabItem).index(this);
-					tabFn.cutoverFn(_index);
+					index = $(tabItem).index(this);
+					tabFn.cutoverFn(index);
 				});
 				if( isAuto ){
-					tabFn.autoFn(_index);
+					tabFn.autoFn(index);
 				}
 			}
 		},
@@ -1337,8 +1342,9 @@ zUI.app = {
  */
 zUI.ui.baseGrid = function(){
 
-	var g     = this,
-		_core = {
+	var g       = this,
+		records = [],
+		_core   = {
 			/**
 			* 内部表格主体内容
 			* @param {object} init 和 refalse共享的对象
@@ -1358,7 +1364,7 @@ zUI.ui.baseGrid = function(){
 				for(; pageStar < pageEnd; pageStar++){
 					tBodyHtml += '<tr>';
 					if( checkbox ){
-						tBodyHtml += '<td style="width:36px"><span class="l-grid-row-cell-btn-checkbox"></span></td>';
+						tBodyHtml += '<td style="width:36px"><span class="l-grid-row-checkbox"></span></td>';
 					}
 					for(var h = 0; h < columns.length; h++){
 						if( columns[h].render !== undefined ){
@@ -1493,7 +1499,6 @@ zUI.ui.baseGrid = function(){
 			* 内部获取行数据
 			* @param {object} init 和 refalse共享的对象
 			* @param {Number} 当前页
-			* @param {Number} 当前页索引
 			*/
 			getRowData: function(options, index){
 				var	data      = options.data.Rows,  //表格数据
@@ -1503,8 +1508,6 @@ zUI.ui.baseGrid = function(){
 				if( index === -1 ){
 					return false;
 				}
-				
-				index = index - 1; //$(obj).index() 传过来是1开始
 				
 				if( pageIndex == 1 ){
 					return data[index];
@@ -1518,17 +1521,19 @@ zUI.ui.baseGrid = function(){
 	g.init = function(o){
 		if(!o){return false;}
 		var options = {
-				data:       o.data,                                     //json数据源
-				columns:    o.columns || {},                            //表格列信息
-				wrap:       $(o.wrap),                                  //收纳表格的容器
-				id:         o.id || 'l-grid-' + (new Date()).valueOf(), //表格ID
-				bottomBtns: o.bottomBtns || {},                         //底部按钮
-				isPager:    o.isPager ? false : true,                   //是否分页
-				pageIndex:  o.pageIndex || 1,                           //默认当前页
-				pageSize:   o.pageSize || 10,                           //每页显示条数
-				onPageFn:   o.onPageFn,                                 //点击分页加载的事件
-				checkbox:   o.checkbox ? true : false,                  //是否有checkbox
-				width:      o.width || 'auto'
+				data:         o.data,                                     //json数据源
+				columns:      o.columns || {},                            //表格列信息
+				wrap:         $(o.wrap),                                  //收纳表格的容器
+				id:           o.id || 'l-grid-' + (new Date()).valueOf(), //表格ID
+				bottomBtns:   o.bottomBtns || {},                         //底部按钮
+				isPager:      o.isPager ? false : true,                   //是否分页
+				pageIndex:    o.pageIndex || 1,                           //默认当前页
+				pageSize:     o.pageSize || 10,                           //每页显示条数
+				onPageFn:     o.onPageFn,                                 //点击分页加载的事件
+				checkbox:     o.checkbox ? true : false,                  //是否有checkbox
+				width:        o.width || 'auto',
+				onCheckFn:    o.onCheckRow || null,                       //选择事件(复选框)
+				onCheckAllFn: o.onCheckAllFn || null,                     //选择事件(复选框 全选/全不选)
 			};
 					
 		/*给g添加一个对象o，并复制options共享该对象*/
@@ -1537,62 +1542,101 @@ zUI.ui.baseGrid = function(){
 			g.o[key] = options[key];
 		}
 		
-		/*插入容器*/
-		options.wrap.append('<div class="l-gird" id="'+ options.id +'"></div>');
-		var grid = $('#' + options.id);
+		/*生成表格*/
 		
-		/*表头*/
-		var tHeadHtml = '';
-		tHeadHtml += '<div class="l-grid-header"><table>';
-		tHeadHtml += '<tr>';
-		if( options.checkbox ){
-			tHeadHtml += '<th style="width:36px"><span class="l-grid-row-cell-btn-checkbox"></span></th>';
-		}
-		for(var i = 0, l = options.columns.length; i < l; i++){
-			tHeadHtml += '<th style="width:'+ options.columns[i].width +'px">'+ options.columns[i].display +'</th>';
-		}
-		tHeadHtml += '</tr>';
-		tHeadHtml += '</table></div>';
-		grid.append(tHeadHtml);
-		
-		/*内容*/
-		var tBodyHtml = _core.tBodyFn(options);
-		grid.append('<div class="l-grid-body">'+ tBodyHtml +'</div>');
-						
-		/*底部*/
-		
-			/*底部结构*/
-			var tFootHtml = '';
-			tFootHtml += '<div class="l-grid-footer">';
-			if( options.bottomBtns.length ){ // 是否有底部按钮
-				tFootHtml += '<div class="l-grid-footer-btns"></div>';
+			/*插入容器*/
+			options.wrap.append('<div class="l-gird" id="'+ options.id +'"></div>');
+			var grid = $('#' + options.id);
+			
+			/*表头*/
+			var tHeadHtml = '';
+			tHeadHtml += '<div class="l-grid-header"><table>';
+			tHeadHtml += '<tr>';
+			if( options.checkbox ){
+				tHeadHtml += '<th style="width:36px"><span class="l-grid-hd-checkbox"></span></th>';
 			}
-			if( options.isPager ){ // 是否显示分页
-				tFootHtml += '<div class="l-grid-footer-pager"></div>';
+			for(var i = 0, l = options.columns.length; i < l; i++){
+				tHeadHtml += '<th style="width:'+ options.columns[i].width +'px">'+ options.columns[i].display +'</th>';
 			}
-			tFootHtml += '</div>';
-			grid.append(tFootHtml);
+			tHeadHtml += '</tr>';
+			tHeadHtml += '</table></div>';
+			grid.append(tHeadHtml);
+			
+			/*内容*/
+			var tBodyHtml = _core.tBodyFn(options);
+			grid.append('<div class="l-grid-body">'+ tBodyHtml +'</div>');
+							
+			/*底部*/
+			
+				/*底部结构*/
+				var tFootHtml = '';
+				tFootHtml += '<div class="l-grid-footer">';
+				if( options.bottomBtns.length ){ // 是否有底部按钮
+					tFootHtml += '<div class="l-grid-footer-btns"></div>';
+				}
+				if( options.isPager ){ // 是否显示分页
+					tFootHtml += '<div class="l-grid-footer-pager"></div>';
+				}
+				tFootHtml += '</div>';
+				grid.append(tFootHtml);
+		
+		/*表格操作*/			
+		var gridHeader = grid.find('.l-grid-header'),
+			gridBody   = grid.find('.l-grid-body'),
+			gridFooter = grid.find('.l-grid-footer');
 			
 			/*按钮*/
-			if( grid.find('.l-grid-footer-btns') ){
+			if( gridFooter.find('.l-grid-footer-btns') ){
 				
 			}
 			
 			/*分页*/
-			if( grid.find('.l-grid-footer-pager') ){
+			if( gridFooter.find('.l-grid-footer-pager') ){
 				_core.pagerFn(options);
 			}
 			
 		/*事件*/
-		grid.find('tr').live('click',function(){
-			var self  = $(this),
-				index = grid.find('tr').index(self),
-				msg   = _core.getRowData(options, index);
 			
-			alert( msg )
 			
-			return msg;
-		});
+			/*单选*/
+			gridBody.find('tr').live('click',function(){
+				var self     = $(this),
+					i        = gridBody.find('tr').index(self),
+					arr      = [],
+					selected = null;				
+				
+				if( !self.hasClass('l-grid-row-checkbox-selected') ){
+					self.addClass('l-grid-row-checkbox-selected');
+					records[i] = _core.getRowData(options, i);
+				}else{
+					self.removeClass('l-grid-row-checkbox-selected');
+					records.splice(i, 1);
+				}
+			});
+			
+			/*全选*/
+			gridHeader.find('.l-grid-hd-checkbox').live('click',function(){
+				var self       = $(this),
+					girdBodyTr = gridBody.find('tr'),
+					len        = girdBodyTr.length,
+					i          = 0,
+					j          = len - 1;
+					
+				if( !self.hasClass('l-grid-hd-checkbox-selected') ){
+					self.addClass('l-grid-hd-checkbox-selected');
+					girdBodyTr.addClass('l-grid-row-checkbox-selected');
+					for(; i < len; i++){
+						records[i] = _core.getRowData(options, i);
+					}
+				}else{
+					self.removeClass('l-grid-hd-checkbox-selected');
+					girdBodyTr.removeClass('l-grid-row-checkbox-selected');
+					for(; j > -1; j--){
+						records.splice(j, 1);
+					}
+				}
+			});
+			
 		
 		return g;
 	};
@@ -1622,7 +1666,14 @@ zUI.ui.baseGrid = function(){
 		if( grid.find('.l-grid-footer-pager') ){
 			_core.pagerFn(o);
 		}
-	}
+		
+		return g;
+	};
+		
+	/*获取行数据*/
+	g.getRowData = function(){
+		return records; //返回的数组，length属性统计包含空的数组元素，应用时需过滤
+	};
 }
 
 zUI.ui.grid = new zUI.ui.baseGrid();
