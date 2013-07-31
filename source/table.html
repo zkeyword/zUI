@@ -29,6 +29,7 @@ $(function(){
 		wrap: '#wrap',
 		data: AllOrdersData,
 		checkbox: true,
+		width: 950,
 		bottomBtns: [
 			{
 				id: 'CustomerID',
@@ -46,16 +47,16 @@ $(function(){
 			}
 		],
 		columns: [
-			{ display: '表头0', name: 'OrderID', width: 50, render: function(rdata, rindex, value){
+			{ display: '表头0', name: 'OrderID', width: 80, render: function(rdata, rindex, value){
 					var h = '<span style="color:#ddd">'+ value +'</span>';
 					return h;
 				}
 			},
-			{ display: '表头1', name: 'CustomerID', width: 80},
-			{ display: '表头2', name: 'EmployeeID', width: 40},
+			{ display: '表头1', name: 'CustomerID', width: 50},
+			{ display: '表头2', name: 'EmployeeID', width: 80},
 			{ display: '表头3', name: 'ShipCity', width: 80},
-			{ display: '表头4', name: 'ShipRegion', width: 50},
-			{ display: '表头5', name: 'ShippedDate', width: 400},
+			{ display: '表头4', name: 'ShipRegion', width: 80},
+			{ display: '表头5', name: 'ShippedDate', width: 200},
 			{ display: '表头6', name: 'ShipName', width: 200}
 		],
 		onPageFn: function(index, pageSize){
@@ -70,9 +71,7 @@ $(function(){
 	$('#getRowData').click(function(){
 		var row = girds.getRowData();
 		var data = girds.o;
-		
-		console.log(row);
-	})
+	});
 	
 	
 });

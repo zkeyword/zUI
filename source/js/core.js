@@ -1358,20 +1358,21 @@ zUI.ui.baseGrid = function(){
 					dataLen   = options.data.Total,                    //记录总数
 					pageStar  = (pageIndex-1)*pageSize,                //当前记录的起始
 					pageEnd   = Math.min(pageIndex*pageSize, dataLen), //当前记录的结束
-					checkbox  = options.checkbox;
+					checkbox  = options.checkbox,                      //选择框
+					width     = options.width;
 
-				tBodyHtml += '<table>';
+				tBodyHtml += '<table style="width:'+ width +'px">';
 				for(; pageStar < pageEnd; pageStar++){
 					tBodyHtml += '<tr>';
 					if( checkbox ){
-						tBodyHtml += '<td style="width:36px"><span class="l-grid-row-checkbox"></span></td>';
+						tBodyHtml += '<td><div class="l-grid-row-cell-inner"><span class="l-checkbox l-grid-row-checkbox"></span></div></td>';
 					}
 					for(var h = 0; h < columns.length; h++){
 						if( columns[h].render !== undefined ){
 							var str = columns[h].render(data[pageStar], pageStar, data[pageStar][columns[h].name]);
-							tBodyHtml += '<td style="width:'+ columns[h].width +'px">'+ str +'</td>';
+							tBodyHtml += '<td><div class="l-grid-row-cell-inner" style="width:'+ columns[h].width +'px">'+ str +'</div></td>';
 						}else{
-							tBodyHtml += '<td style="width:'+ columns[h].width +'px">'+ data[pageStar][columns[h].name] +'</td>';
+							tBodyHtml += '<td><div class="l-grid-row-cell-inner" style="width:'+ columns[h].width +'px">'+ data[pageStar][columns[h].name] +'</div></td>';
 						}
 					}
 					tBodyHtml += '</tr>';
@@ -1492,13 +1493,18 @@ zUI.ui.baseGrid = function(){
 					if( zUI.base.isFunction(onPageFn, pageSize) ){
 						onPageFn(index, pageSize);
 					}
+					
+					/*修改选中的数组值*/
+					records = [];
+					
+					/*选择框初始化*/
 				});
 			},
 			
 			/**
 			* 内部获取行数据
 			* @param {object} init 和 refalse共享的对象
-			* @param {Number} 当前页
+			* @param {Number} 记录的索引值
 			*/
 			getRowData: function(options, index){
 				var	data      = options.data.Rows,  //表格数据
@@ -1533,7 +1539,7 @@ zUI.ui.baseGrid = function(){
 				checkbox:     o.checkbox ? true : false,                  //是否有checkbox
 				width:        o.width || 'auto',
 				onCheckFn:    o.onCheckRow || null,                       //选择事件(复选框)
-				onCheckAllFn: o.onCheckAllFn || null,                     //选择事件(复选框 全选/全不选)
+				onCheckAllFn: o.onCheckAllFn || null                      //选择事件(复选框 全选/全不选)
 			};
 					
 		/*给g添加一个对象o，并复制options共享该对象*/
@@ -1550,13 +1556,13 @@ zUI.ui.baseGrid = function(){
 			
 			/*表头*/
 			var tHeadHtml = '';
-			tHeadHtml += '<div class="l-grid-header"><table>';
+			tHeadHtml += '<div class="l-grid-header"><table style="width:'+ options.width +'px">';
 			tHeadHtml += '<tr>';
 			if( options.checkbox ){
-				tHeadHtml += '<th style="width:36px"><span class="l-grid-hd-checkbox"></span></th>';
+				tHeadHtml += '<th><div class="l-grid-hd-cell-inner"><span class="l-checkbox l-grid-hd-checkbox"></span></div></th>';
 			}
 			for(var i = 0, l = options.columns.length; i < l; i++){
-				tHeadHtml += '<th style="width:'+ options.columns[i].width +'px">'+ options.columns[i].display +'</th>';
+				tHeadHtml += '<th><div class="l-grid-hd-cell-inner" style="width:'+ options.columns[i].width +'px">'+ options.columns[i].display +'</div></th>';
 			}
 			tHeadHtml += '</tr>';
 			tHeadHtml += '</table></div>';
@@ -1594,49 +1600,52 @@ zUI.ui.baseGrid = function(){
 			if( gridFooter.find('.l-grid-footer-pager') ){
 				_core.pagerFn(options);
 			}
-			
+						
 		/*事件*/
-			
-			
+					
 			/*单选*/
-			gridBody.find('tr').live('click',function(){
+			gridBody.find('.l-checkbox').live('click',function(){
 				var self     = $(this),
-					i        = gridBody.find('tr').index(self),
+					i        = gridBody.find('.l-checkbox').index(self),
 					arr      = [],
 					selected = null;				
 				
-				if( !self.hasClass('l-grid-row-checkbox-selected') ){
-					self.addClass('l-grid-row-checkbox-selected');
+				if( !self.hasClass('l-checkbox-selected') ){
+					self.addClass('l-checkbox-selected');
 					records[i] = _core.getRowData(options, i);
+					/*全部选上时给表头全选*/
+					if( gridBody.find('.l-checkbox-selected').length == options.pageSize ){
+						gridHeader.find('.l-checkbox').addClass('l-checkbox-selected');
+					}
 				}else{
-					self.removeClass('l-grid-row-checkbox-selected');
-					records.splice(i, 1);
+					records.splice(i, 1, null); //赋一个null值，站位，防bug
+					self.removeClass('l-checkbox-selected');
+					gridHeader.find('.l-checkbox').removeClass('l-checkbox-selected');
 				}
 			});
 			
 			/*全选*/
-			gridHeader.find('.l-grid-hd-checkbox').live('click',function(){
-				var self       = $(this),
-					girdBodyTr = gridBody.find('tr'),
-					len        = girdBodyTr.length,
-					i          = 0,
-					j          = len - 1;
+			gridHeader.find('.l-checkbox').live('click',function(){
+				var self     = $(this),
+					checkbox = gridBody.find('.l-checkbox'),
+					len      = checkbox.length,
+					i        = 0,
+					j        = len - 1;
 					
-				if( !self.hasClass('l-grid-hd-checkbox-selected') ){
-					self.addClass('l-grid-hd-checkbox-selected');
-					girdBodyTr.addClass('l-grid-row-checkbox-selected');
+				if( !self.hasClass('l-checkbox-selected') ){
+					self.addClass('l-checkbox-selected');
+					checkbox.addClass('l-checkbox-selected');
 					for(; i < len; i++){
 						records[i] = _core.getRowData(options, i);
 					}
 				}else{
-					self.removeClass('l-grid-hd-checkbox-selected');
-					girdBodyTr.removeClass('l-grid-row-checkbox-selected');
+					self.removeClass('l-checkbox-selected');
+					checkbox.removeClass('l-checkbox-selected');
 					for(; j > -1; j--){
 						records.splice(j, 1);
 					}
 				}
 			});
-			
 		
 		return g;
 	};
@@ -1672,8 +1681,18 @@ zUI.ui.baseGrid = function(){
 		
 	/*获取行数据*/
 	g.getRowData = function(){
-		return records; //返回的数组，length属性统计包含空的数组元素，应用时需过滤
+		var arr = [],
+			len = records.length,
+			i   = 0;
+		/*过滤掉records下面的空元素*/
+		for(; i < len; i++){
+			if( records[i] ){
+				arr.push(records[i])
+			}
+		}
+		return arr;
 	};
+	
 }
 
 zUI.ui.grid = new zUI.ui.baseGrid();
