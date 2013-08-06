@@ -1346,64 +1346,107 @@ zUI.ui.baseGrid = function(){
 		records = [],
 		_core   = {
 			/**
+			* 内部表格表头内容
+			* @param {object} init 和 reflash共享的对象
+			*/
+			tHeadFn: function(options){
+				var columns   = options.columns,
+					len       = columns.length,
+					width     = options.width,
+					detail    = options.detail,   //表格明细
+					checkbox  = options.checkbox, //复选框
+					i         = 0,
+					s         = '';
+
+				s += '<div class="l-grid-header"><table style="width:'+ width +'px">';
+				s += '<tr>';
+				if( detail ){
+					s += '<th><div class="l-grid-row-cell-inner"><span class="l-detailbtn l-grid-row-detailbtn"></span></div></th>';
+				}
+				if( checkbox ){
+					s += '<th><div class="l-grid-hd-cell-inner"><span class="l-checkbox l-grid-hd-checkbox"></span></div></th>';
+				}
+				for(; i < len; i++){
+					s += '<th><div class="l-grid-hd-cell-inner" style="width:'+ columns[i].width +'px">'+ columns[i].display +'</div></th>';
+				}
+				s += '</tr>';
+				s += '</table></div>';
+				return s;
+			},
+			/**
 			* 内部表格主体内容
-			* @param {object} init 和 refalse共享的对象
+			* @param {object} init 和 reflash共享的对象
 			*/
 			tBodyFn: function(options){
 				var columns   = options.columns,
 					data      = options.data.Rows,
 					pageSize  = options.pageSize,
 					pageIndex = options.pageIndex,
-					tBodyHtml = '',
+					width     = options.width,
+					checkbox  = options.checkbox,                      //选择框
 					dataLen   = options.data.Total,                    //记录总数
 					pageStar  = (pageIndex-1)*pageSize,                //当前记录的起始
 					pageEnd   = Math.min(pageIndex*pageSize, dataLen), //当前记录的结束
-					checkbox  = options.checkbox,                      //选择框
-					width     = options.width;
+					detail    = options.detail,                        //行明细
+					s         = '';
 
-				tBodyHtml += '<table style="width:'+ width +'px">';
+				s += '<table style="width:'+ width +'px">';
 				for(; pageStar < pageEnd; pageStar++){
-					tBodyHtml += '<tr>';
-					if( checkbox ){
-						tBodyHtml += '<td><div class="l-grid-row-cell-inner"><span class="l-checkbox l-grid-row-checkbox"></span></div></td>';
-					}
-					for(var h = 0; h < columns.length; h++){
-						if( columns[h].render !== undefined ){
-							var str = columns[h].render(data[pageStar], pageStar, data[pageStar][columns[h].name]);
-							tBodyHtml += '<td><div class="l-grid-row-cell-inner" style="width:'+ columns[h].width +'px">'+ str +'</div></td>';
-						}else{
-							tBodyHtml += '<td><div class="l-grid-row-cell-inner" style="width:'+ columns[h].width +'px">'+ data[pageStar][columns[h].name] +'</div></td>';
+					if( data[pageStar] ){
+						s += '<tr>';
+						if( detail ){
+							s += '<td><div class="l-grid-row-cell-inner"><span class="l-detailbtn l-grid-row-detailbtn"></span></div></td>';
+						}
+						if( checkbox ){
+							s += '<td><div class="l-grid-row-cell-inner"><span class="l-checkbox l-grid-row-checkbox"></span></div></td>';
+						}
+						for(var h = 0; h < columns.length; h++){
+							if( columns[h].render !== undefined ){
+								var str = columns[h].render(data[pageStar], pageStar, data[pageStar][columns[h].name]);
+								s += '<td><div class="l-grid-row-cell-inner" style="width:'+ columns[h].width +'px">'+ str +'</div></td>';
+							}else{
+								s += '<td><div class="l-grid-row-cell-inner" style="width:'+ columns[h].width +'px">'+ data[pageStar][columns[h].name] +'</div></td>';
+							}
+						}
+						s += '</tr>';
+						if( detail.render !== undefined ){
+							var str    = detail.render(),
+								colLen = columns.length + (checkbox ? 1 : 0) + 1;
+							s += '<tr><td colspan="'+ colLen +'"><div class="l-grid-row-cell-detail">'+ str +'</div></td></tr>';
 						}
 					}
-					tBodyHtml += '</tr>';
 				}
-				tBodyHtml += '</table>';
-				return tBodyHtml;
+				s += '</table>';
+				return s;
 			},
 			
 			/**
 			* 内部分页函数
-			* @param {object} init 和 refalse共享的对象
+			* @param {object} init 和 reflash共享的对象
 			*/
-			pagerFn: function (options) {
-				var columns    = options.columns,                   //表格columns
-					id         = options.id,                        //表格ID
-					pageSize   = options.pageSize,                  //每页显示多少个
-					pageIndex  = options.pageIndex,                 //起始位置
-					data       = options.data.Rows,                 //表格数据
-					count      = options.data.Total,                //记录总个数
-					onPageFn   = options.onPageFn,                  //记录总个数
-					itemNum    = 2,                                 //当前页两边显示个数
-					html       = '',
-					grid       = $('#'+id),
-					pager      = grid.find('.l-grid-footer-pager'), //分页容器
+			pagerFn: function(options){
+				var columns     = options.columns,                   //表格columns
+					id          = options.id,                        //表格ID
+					pageSize    = options.pageSize,                  //每页显示多少个
+					pageIndex   = options.pageIndex,                 //起始位置
+					count       = options.data.Total || 0,           //记录总个数
+					onPageFn    = options.onPageFn,                  //记录总个数
+					isMemory    = options.isMemory,                  //翻页是否记住选择记录
+					isPageCache = options.isPageCache,               //翻页是否缓存
+					itemNum     = 2,                                 //当前页两边显示个数
+					html        = '',
+					grid        = $('#'+id),
+					gridHeader  = grid.find('.l-grid-header'),       //表格头
+					gridBody    = grid.find('.l-grid-body'),         //表格主体
+					pager       = grid.find('.l-grid-footer-pager'), //分页容器
+					
 					/**
 					* 获取数字连接
 					* @param {Number} 当前位置
 					* @param {Number} 
 					* @param {String} 上下翻页的文本
 					*/
-					_getLink   = function(index, pageNum, txt){
+					_getLink    = function(index, pageNum, txt){
 						var s       = '',
 							current = txt ? (index == pageNum ? ' class="on"' : '') : '',
 							txt     = txt || index;
@@ -1412,26 +1455,28 @@ zUI.ui.baseGrid = function(){
 							 + current + '>'+ txt +'</a>';
 						return s;
 					},
+					
 					/**
 					* 获取显示的数据
 					* @param {Number} 每页显示条数
 					* @param {Number} 数据长度
 					* @param {Number} 当前位置
 					*/
-					_getCount  = function(pageSize, count, index){
+					_getCount   = function(pageSize, count, index){
 						var s = '';
 						
 						s += '显示从'+ ( (index-1)*pageSize + 1 ) +'到'+ index*pageSize;
 						s += '，总 '+ count +' 条 。每页显示：'+ pageSize;
 						return s;
 					},
+					
 					/**
 					* 获取分页按钮
 					* @param {Number} 每页显示条数
 					* @param {Number} 数据长度
 					* @param {Number} 当前位置
 					*/
-					_getBtn = function(pageSize, count, index){
+					_getBtn     = function(pageSize, count, index){
 						var s       = '',
 							begin   = 1,
 							end     = 1,
@@ -1475,59 +1520,190 @@ zUI.ui.baseGrid = function(){
 				pager.html(html);
 				
 				/*分页事件*/
-				pager.find('.l-grid-footer-pager-btn a').live('click',function(){
-					var gridBody    = grid.find('.l-grid-body'),
-						gridpageMsg = pager.find('.l-grid-footer-pager-msg'),
+				pager.find('.l-grid-footer-pager-btn a').die().live('click',function(){
+					var gridpageMsg = pager.find('.l-grid-footer-pager-msg'),
 						gridpageBtn = pager.find('.l-grid-footer-pager-btn'),
 						index       = Number( $(this).attr('page') ); // attr返回 string
 														
-					/*修改 options 对象中的 pageIndex 成员*/
+					/*修改全局g.o的 pageIndex 成员*/
 					options.pageIndex = index;
 					
+					/*返回接口，可能修改全局g.o对象，所以前置*/
+					if( zUI.base.isFunction(onPageFn) ){
+						if( isPageCache ){
+							var cache = options.cache[index];
+							onPageFn(index, pageSize, cache);
+						}else{
+							onPageFn(index, pageSize);
+						}
+					}
+
 					/*重载html*/
-					gridBody.html(_core.tBodyFn(options));
+					gridBody.html( _core.tBodyFn(options) );
 					gridpageMsg.html( _getCount(pageSize, count, index) );
 					gridpageBtn.html( _getBtn(pageSize, count, index) );
 					
-					/*返回接口*/
-					if( zUI.base.isFunction(onPageFn, pageSize) ){
-						onPageFn(index, pageSize);
+					/*全部选上时给表头全选*/
+					if( gridBody.find('.l-checkbox-selected').length == pageSize ){
+						gridHeader.find('.l-checkbox').addClass('l-checkbox-selected');
+					}else{
+						gridHeader.find('.l-checkbox').removeClass('l-checkbox-selected');
 					}
 					
-					/*修改选中的数组值*/
-					records = [];
-					
-					/*选择框初始化*/
+					/*是否记录选择框的选择结果*/
+					if( !isMemory ){
+						records = []; //修改选中的数组值
+					}else{
+						_core.initCheckbox(options, records); //初始化选中状态
+					}
 				});
+				
+				/*是否记录选择框的选择结果*/
+				if( !isMemory ){
+					records = []; //修改选中的数组值
+				}else{
+					_core.initCheckbox(options, records); //初始化选中状态
+				}
+
 			},
 			
 			/**
 			* 内部获取行数据
-			* @param {object} init 和 refalse共享的对象
+			* @param {Object} init 和 reflash共享的对象
 			* @param {Number} 记录的索引值
 			*/
 			getRowData: function(options, index){
-				var	data      = options.data.Rows,  //表格数据
-					pageSize  = options.pageSize,   //每页显示的长度
-					pageIndex = options.pageIndex   //当前页
+				var	data      = options.data.Rows; //表格数据
 					
 				if( index === -1 ){
 					return false;
 				}
 				
-				if( pageIndex == 1 ){
-					return data[index];
-				}		
+				return data[index];
+			},
+			
+			/**
+			* 初始化选择框
+			* @param {object} init 和 reflash共享的对象
+			*/
+			initCheckbox: function(options, selectedRecords){
+				var pageSize   = options.pageSize,                  //每页显示多少个
+					pageIndex  = options.pageIndex,                  //起始位置
+					id         = options.id,                         //表格ID
+					grid       = $('#'+id),
+					gridHeader = grid.find('.l-grid-header'),        //表格头
+					gridBody   = grid.find('.l-grid-body'),          //表格主体
+					checkbox   = gridBody.find('.l-checkbox'),       //复选框
+					len        = selectedRecords.length,
+					i          = pageSize*(pageIndex-1),
+					j          = 0,
+					selected   = Math.min(pageSize, checkbox.length); //已选数量
 				
-				return data[ (pageIndex-1)*pageSize + index ];
+				for(; i < len; i++, j++){
+					if( selectedRecords[i] ){
+						checkbox.eq(j).addClass('l-checkbox-selected');
+					}
+				}
+
+				/*全部选上时给表头全选*/
+				if( gridBody.find('.l-checkbox-selected').length == selected ){
+					gridHeader.find('.l-checkbox').addClass('l-checkbox-selected');
+				}
+			},
+			
+			/**
+			* 选择框事件
+			* @param {object} init 和 reflash共享的对象
+			*/
+			checkboxFn: function(options){
+				var id         = options.id,                  //表格ID
+					grid       = $('#'+id),
+					gridHeader = grid.find('.l-grid-header'), //表格头
+					gridBody   = grid.find('.l-grid-body'),   //表格主体
+					isMemory   = options.isMemory,            //是否记住选择
+					onCheckFn  = options.onCheckFn;           //点击后执行
+
+				/*多选*/
+				gridBody.find('.l-checkbox').live('click',function(){
+					var self      = $(this),
+						pageSize  = g.o.pageSize,                        //每次触发重新查找pageSize
+						pageIndex = g.o.pageIndex,                       //每次触发重新查找pageIndex
+						checkbox  = gridBody.find('.l-checkbox'),
+						i         = checkbox.index(self),
+						arr       = [],
+						selected  = Math.min(pageSize, checkbox.length); //已选数量
+					
+					if( isMemory ){
+						i = i + pageSize*(pageIndex - 1);
+					}
+										
+					if( !self.hasClass('l-checkbox-selected') ){
+						self.addClass('l-checkbox-selected');
+						records[i] = _core.getRowData(options, i);
+
+						/*全部选上时给表头全选*/
+						if( gridBody.find('.l-checkbox-selected').length == selected ){
+							gridHeader.find('.l-checkbox').addClass('l-checkbox-selected');
+						}
+					}else{
+						records.splice(i, 1, null); //赋一个null值，站位，防bug
+						self.removeClass('l-checkbox-selected');
+						gridHeader.find('.l-checkbox').removeClass('l-checkbox-selected');
+					}
+										
+					/*返回选择数据*/
+					if( zUI.base.isFunction(onCheckFn) ){
+						onCheckFn();
+					}
+
+				});
+				
+				/*全选*/
+				gridHeader.find('.l-checkbox').live('click',function(){
+					var self      = $(this),
+						pageSize  = g.o.pageSize,                 //每次触发重新查找pageSize
+						pageIndex = g.o.pageIndex,                //每次触发重新查找pageIndex
+						checkbox  = gridBody.find('.l-checkbox'),
+						len       = checkbox.length,
+						i         = 0,
+						j         = len - 1;
+					
+					if( isMemory ){
+						i   = pageSize*(g.o.pageIndex - 1);
+						len = len + i;
+					}
+						
+					if( !self.hasClass('l-checkbox-selected') ){
+						self.addClass('l-checkbox-selected');
+						checkbox.addClass('l-checkbox-selected');
+						for(; i < len; i++){
+							records[i] = _core.getRowData(options, i);
+						}
+					}else{
+						self.removeClass('l-checkbox-selected');
+						checkbox.removeClass('l-checkbox-selected');
+						for(; j > -1; j--){
+							records.splice(j, 1);
+						}
+					}
+					
+					/*返回选择数据*/
+					if( zUI.base.isFunction(onCheckFn) ){
+						onCheckFn();
+					}
+				});
 			}
 		}
 	
-	/*表格初始化*/
+	/**
+	* 表格初始化
+	* @param {Object} 页面传过来的对象
+	* @return {Object} 表格对象
+	*/
 	g.init = function(o){
 		if(!o){return false;}
 		var options = {
-				data:         o.data,                                     //json数据源
+				data:         o.data || {},                                     //json数据源
 				columns:      o.columns || {},                            //表格列信息
 				wrap:         $(o.wrap),                                  //收纳表格的容器
 				id:           o.id || 'l-grid-' + (new Date()).valueOf(), //表格ID
@@ -1538,12 +1714,14 @@ zUI.ui.baseGrid = function(){
 				onPageFn:     o.onPageFn,                                 //点击分页加载的事件
 				checkbox:     o.checkbox ? true : false,                  //是否有checkbox
 				width:        o.width || 'auto',
-				onCheckFn:    o.onCheckRow || null,                       //选择事件(复选框)
-				onCheckAllFn: o.onCheckAllFn || null                      //选择事件(复选框 全选/全不选)
+				onCheckFn:    o.onCheckFn || null,                        //选择事件(复选框)
+				isMemory:     o.isMemory ? false : true,                  //翻页是否记住选择记录
+				isPageCache:  o.isPageCache ? false : true,               //翻页是否缓存数据
+				nullText:     o.nullText ? o.nullText : '',               //数据为空时的提示文本
+				detail:       o.detail || {}
 			};
 					
-		/*给g添加一个对象o，并复制options共享该对象*/
-		g.o = {};		
+		/*复制options共享g.o对象*/
 		for(var key in options){
 			g.o[key] = options[key];
 		}
@@ -1555,22 +1733,16 @@ zUI.ui.baseGrid = function(){
 			var grid = $('#' + options.id);
 			
 			/*表头*/
-			var tHeadHtml = '';
-			tHeadHtml += '<div class="l-grid-header"><table style="width:'+ options.width +'px">';
-			tHeadHtml += '<tr>';
-			if( options.checkbox ){
-				tHeadHtml += '<th><div class="l-grid-hd-cell-inner"><span class="l-checkbox l-grid-hd-checkbox"></span></div></th>';
-			}
-			for(var i = 0, l = options.columns.length; i < l; i++){
-				tHeadHtml += '<th><div class="l-grid-hd-cell-inner" style="width:'+ options.columns[i].width +'px">'+ options.columns[i].display +'</div></th>';
-			}
-			tHeadHtml += '</tr>';
-			tHeadHtml += '</table></div>';
+			var tHeadHtml = _core.tHeadFn(options);
 			grid.append(tHeadHtml);
 			
 			/*内容*/
-			var tBodyHtml = _core.tBodyFn(options);
-			grid.append('<div class="l-grid-body">'+ tBodyHtml +'</div>');
+			if( options.data ){
+				var tBodyHtml = _core.tBodyFn(options);
+				grid.append('<div class="l-grid-body">'+ tBodyHtml +'</div>');
+			}else{
+				grid.append('<div class="l-grid-body">'+ options.nullText +'</div>');
+			}
 							
 			/*底部*/
 			
@@ -1586,114 +1758,135 @@ zUI.ui.baseGrid = function(){
 				tFootHtml += '</div>';
 				grid.append(tFootHtml);
 		
-		/*表格操作*/			
-		var gridHeader = grid.find('.l-grid-header'),
-			gridBody   = grid.find('.l-grid-body'),
-			gridFooter = grid.find('.l-grid-footer');
-			
-			/*按钮*/
-			if( gridFooter.find('.l-grid-footer-btns') ){
-				
-			}
-			
-			/*分页*/
-			if( gridFooter.find('.l-grid-footer-pager') ){
-				_core.pagerFn(options);
-			}
-						
-		/*事件*/
+				var gridFooter = grid.find('.l-grid-footer');
 					
-			/*单选*/
-			gridBody.find('.l-checkbox').live('click',function(){
-				var self     = $(this),
-					i        = gridBody.find('.l-checkbox').index(self),
-					arr      = [],
-					selected = null;				
+				/*按钮*/
+				if( gridFooter.find('.l-grid-footer-btns') ){
+					var gridFooterBtn = gridFooter.find('.l-grid-footer-btns'),
+						tFootBtnArr   = [],
+						btnData       = options.bottomBtns;
+
+					$.each(btnData, function(i, item){
+						gridFooterBtn.append('<a href="#btn" id="'+ item.id +'" class="l-btn ui-btn"><span class="ui-btnItem">'+ item.text +'</span></a>')
+						item.onclick && gridFooterBtn.find('.l-btn').eq(i).click(function(){
+							item.onclick(i,item);
+						});
+					});
+				}
 				
-				if( !self.hasClass('l-checkbox-selected') ){
-					self.addClass('l-checkbox-selected');
-					records[i] = _core.getRowData(options, i);
-					/*全部选上时给表头全选*/
-					if( gridBody.find('.l-checkbox-selected').length == options.pageSize ){
-						gridHeader.find('.l-checkbox').addClass('l-checkbox-selected');
-					}
-				}else{
-					records.splice(i, 1, null); //赋一个null值，站位，防bug
-					self.removeClass('l-checkbox-selected');
-					gridHeader.find('.l-checkbox').removeClass('l-checkbox-selected');
+				/*分页*/
+				if( gridFooter.find('.l-grid-footer-pager') ){
+									
+					/*翻页缓存*/
+					if(	options.isPageCache ){
+						var i   = 0,
+							len = options.data.Total;
+							
+						g.o.cache = [];  //给g.o添加一个cache成员
+						for(; i < len; i++){
+							g.o.cache[i] = null;
+						}
+					};
+					_core.pagerFn(g.o);
 				}
-			});
 			
-			/*全选*/
-			gridHeader.find('.l-checkbox').live('click',function(){
-				var self     = $(this),
-					checkbox = gridBody.find('.l-checkbox'),
-					len      = checkbox.length,
-					i        = 0,
-					j        = len - 1;
-					
-				if( !self.hasClass('l-checkbox-selected') ){
-					self.addClass('l-checkbox-selected');
-					checkbox.addClass('l-checkbox-selected');
-					for(; i < len; i++){
-						records[i] = _core.getRowData(options, i);
-					}
-				}else{
-					self.removeClass('l-checkbox-selected');
-					checkbox.removeClass('l-checkbox-selected');
-					for(; j > -1; j--){
-						records.splice(j, 1);
-					}
-				}
-			});
-		
+			/*选择框*/
+			_core.checkboxFn(g.o);
+			
+
 		return g;
 	};
 	
-	/*表格刷新数据源*/
-	g.reflash = function(data, pageIndex){
-		var o         = g.o,
-			columns   = o.columns || {},
-			wrap      = $(o.wrap),
-			id        = o.id,
-			pageSize  = o.pageSize;  
-				
-		var grid     = $('#'+id),
-			gridBody = grid.find('.l-grid-body');
+	/**
+	* 表格全局数据源
+	*/
+	g.o = {};		
+	
+	/**
+	* 表格刷新数据源
+	* @param {Number} 页面值索引
+	* @param {Object} init 和 reflash共享的对象，有缓存就不用传值了
+	*/
+	g.reflash = function(data, index){
+		var options   = g.o,
+			columns   = options.columns || {},
+			wrap      = $(options.wrap),
+			id        = options.id,
+			pageSize  = options.pageSize,          //每页长度
+			count     = options.data.Total || 0,   //记录总个数
+			grid      = $('#'+id),
+			gridBody  = grid.find('.l-grid-body');
 		
-		/*修改 o 对象的 data,pageIndex 成员*/
-		o.data = data;
-		if( pageIndex ){
-			o.pageIndex = pageIndex; 
+		if( index ){
+			/*缓存已翻页数据，与_core.pageFn配合*/
+			var arr  = [],
+				//len  = index*pageSize,       //翻页后总长
+				star = (index - 1)*pageSize, //当前页的起始位置
+				i    = 0,
+				n    = 0;
+
+			for(; i < count; i++){
+				if( options.data.Rows[i] ){
+					arr[i] = options.data.Rows[i];
+				}else{
+					arr[i] = null;
+				}
+			}
+			if( !options.cache[index] && data ){
+				for(; n < pageSize; n++){
+					arr[star] = data.Rows[n];
+					star++;
+				}
+			}
+			
+			options.pageIndex = index;
+			options.data.Rows = arr;
+			options.cache[index] = true;
+		}else{
+			/*无指定索引，一次性刷新表格主体*/
+			var tBodyHtml = '';
+			options.pageIndex = 1;
+			options.data = data;
+			tBodyHtml = _core.tBodyFn(options);
+			gridBody.html(tBodyHtml);
 		}
-		
-		/*内容*/
-		var tBodyHtml = _core.tBodyFn(o);
-		gridBody.html(tBodyHtml);
 		
 		/*分页*/
 		if( grid.find('.l-grid-footer-pager') ){
-			_core.pagerFn(o);
+			_core.pagerFn(options);
 		}
 		
 		return g;
 	};
 		
-	/*获取行数据*/
-	g.getRowData = function(){
-		var arr = [],
-			len = records.length,
-			i   = 0;
+	/**
+	* 表格选中后的数据源
+	* @return {Object} 返回一个表格数据源
+	*/
+	g.getSelectData = function(){
+		var arr   = [],
+			i     = 0,                
+			len   = records.length, //记录的长度
+			data  = {},             //data对象
+			total = 0;              //data个数
+			
 		/*过滤掉records下面的空元素*/
 		for(; i < len; i++){
 			if( records[i] ){
 				arr.push(records[i])
 			}
 		}
-		return arr;
+		
+		/*组装一个表格适用的data数据*/
+		total = arr.length;
+		data = {
+			"Rows": arr,
+			"Total":total
+		}
+		
+		return data;
 	};
 	
 }
-
-zUI.ui.grid = new zUI.ui.baseGrid();
-
+zUI.ui.baseGrid = new zUI.ui.baseGrid();
+zUI.ui.grid = zUI.ui.baseGrid.init;

@@ -11,6 +11,9 @@
 	/*选择框*/
 	.l-checkbox{display:block;width:13px;height:13px;cursor:pointer;background:url(../images/l-checkbox.gif) no-repeat;}
 	.l-checkbox-selected{background-position:0 -13px}
+	
+	/*详细按钮*/
+	.l-detailbtn{display:block;width:13px;height:13px;cursor:pointer;background:#000}
 
 /*表格头部*/
 .l-grid-header table{border-collapse:collapse;border-spacing:0;border:1px solid #ddd;font-size:14px;color:#333;background-color:#fff;}
