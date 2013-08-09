@@ -1,3 +1,9 @@
+/**
+ * zUI
+ * @author norion
+ * @blog http://zkeyword.com/
+ */
+
 'use strict';
 
 (function() {
@@ -5,7 +11,7 @@
 	
 	//获取中文长度
 	String.prototype.getLength = function(){
-		return this.replace(/[^\x00-\xff]/g,"en").length; //若为中文替换成两个字母
+		return this.replace(/[^\x00-\xff]/g, "en").length; //若为中文替换成两个字母
 	};
 	
 	//清空空格
@@ -36,9 +42,16 @@
 	};
 	
 	zUI._INSTALL();
-}());
+}(window));
 
-/*zUI.base基础层*/
+
+/**
+ * zUI.base基础层
+ * @class zUI.base
+ * @requires zUI.base
+ * @author norion
+ * @blog http://zkeyword.com/
+ */
 zUI.base = {
 	domain: {
 		url: 'http://127.0.0.1'
@@ -53,14 +66,20 @@ zUI.base = {
 		return o ? jQuery.isArray(o) : false;
 	},
 	isObject: function(o){
-		return o ? Object.prototype.toString.call(o) == "[object Object]" : false;
+		return o ? Object.prototype.toString.call(o) === "[object Object]" : false;
 	},
 	isFunction: function(o){
-		return o ? Object.prototype.toString.call(o) == "[object Function]" : false;
+		return o ? Object.prototype.toString.call(o) === "[object Function]" : false;
 	}
 };
 
-/*zUI.base.browser*/
+/**
+ * browser
+ * @class zUI.base.browser
+ * @requires zUI.base
+ * @author norion
+ * @blog http://zkeyword.com/
+ */
 zUI.base.browser = (function(){
 	var na            = window.navigator,
 		browserTester = /(msie|webkit|gecko|presto|opera|safari|firefox|chrome|maxthon|android|ipad|iphone|webos|hpwos)[ \/os]*([\d_.]+)/ig,
@@ -89,12 +108,18 @@ if( zUI.base.browser.ie6 ) {
 	} catch (e) {}
 }
 
-/*zUI.base.cookie*/
+/**
+ * cookie
+ * @class zUI.base.cookie
+ * @requires zUI.base
+ * @author norion
+ * @blog http://zkeyword.com/
+ */
 zUI.base.cookie = {
     set: function (name, value, domain, path, hour) {
 		if (hour) {
-			var today  = new Date,
-				expire = new Date;
+			var today  = new Date(),
+				expire = new Date();
 			expire.setTime(today.getTime() + 36E5 * hour);
 		}
 		document.cookie = name + "=" + escape(value) + "; " + (hour ? "expires=" + expire.toGMTString() + "; " : "") + (path ? "path=" + path + "; " : "path=/; ") + (domain ? "domain=" + domain + ";" : "");
@@ -110,7 +135,13 @@ zUI.base.cookie = {
 	}
 };
 
-/*zUI.ui前端显示层*/
+/**
+ * zUI.ui前端显示层
+ * @class zUI.ui
+ * @requires zUI.base
+ * @author norion
+ * @blog http://zkeyword.com/
+ */
 zUI.ui = {
 	/*标识ID*/
 	uniqueId: function(){
@@ -136,7 +167,7 @@ zUI.ui = {
 			bodyH = $(document).height();
 		if( !$('.l-ui-lock').length ){
 			body.append('<div class="l-ui-lock"></div>')
-				.find('.l-ui-lock').css({ width:bodyW,height:bodyH,filter:'Alpha(opacity=20)' });
+				.find('.l-ui-lock').css({ width:bodyW, height:bodyH, filter:'Alpha(opacity=20)' });
 		}else{
 			$('.l-ui-lock').show();
 		}
@@ -164,12 +195,14 @@ zUI.ui = {
 	})()
 };
 
+
 /**
- * @name 拖动插件 v1.0
+ * 拖动插件 
+ * @constructor zUI.ui.tab
+ * @extends zUI.ui
+ * @requires zUI.base
  * @author norion
  * @blog http://zkeyword.com/
- * @update 2013.04.1
- * @param {object} options
  * @example 
    zUI.ui.drag({
 	   dragItem:'#dragItem',
@@ -195,19 +228,21 @@ zUI.ui.drag = function(options){
         var e = window.event || event;
         mouse.x = e.clientX;
         mouse.y = e.clientY;
-        $(win).bind('mousemove',_moveDialog);
+        $(win).bind('mousemove', _moveDialog);
     });
     $(win).mouseup(function(event){
         $(win).unbind('mousemove', _moveDialog);
     });
 };
 
+
 /**
- * @name tabs选项卡插件 v1.4
+ * ttabs选项卡插件
+ * @constructor zUI.ui.tab
+ * @extends zUI.ui
+ * @requires zUI.base
  * @author norion
  * @blog http://zkeyword.com/
- * @update 2013.04.16
- * @param {object} options
  * @example 
 	zUI.ui.tab({
 		tabItem:'#tab li',
@@ -251,7 +286,7 @@ zUI.ui.tab = function(options){
 		/*切换函数*/
 		cutoverFn: function(i){
 			//tab切换内容的html不为空才做下面动作
-			if( $(tabWrap).eq(i).html() != '' ){
+			if( $(tabWrap).eq(i).html() !== '' ){
 				if( autoSpeed ){
 					$(tabWrap).eq(i).stop(true,true).fadeIn(autoSpeed).siblings(tabWrap).fadeOut(autoSpeed);
 				}else{
@@ -272,8 +307,8 @@ zUI.ui.tab = function(options){
 			var _mun    = $(tabWrap).size(),
 				_MyTime = setInterval(function(){
 					tabFn.cutoverFn(i);
-					i ++;
-					if( i == _mun ){
+					i++;
+					if( i === _mun ){
 						i = 0;
 					};
 				},autoTime);
@@ -283,7 +318,7 @@ zUI.ui.tab = function(options){
 				_MyTime = setInterval(function(){
 					tabFn.cutoverFn(i);
 					i ++;
-					if( i == _mun ){
+					if( i === _mun ){
 						i = 0;
 					};
 				},autoTime);
@@ -293,14 +328,14 @@ zUI.ui.tab = function(options){
 	tabFn.init();
 };
 
+
 /**
- * @name title属性模拟插件 v1.0
+ * title属性模拟插件
+ * @constructor zUI.ui.tip
+ * @extends zUI.ui
+ * @requires zUI.base
  * @author norion
  * @blog http://zkeyword.com/
- * @update 2013.04.2
- * @param {object} options
- * @example 
-	
  */
 zUI.ui.tip = function(options){
 	var o = options || {};
@@ -373,7 +408,7 @@ zUI.ui.tip = function(options){
 				tipWrapWidth  = tipWrap[0].offsetWidth,
 				top           = 0,
 				left          = 0;
-			if( arrowDirection == 'topBottom' ){
+			if( arrowDirection === 'topBottom' ){
 				tipArrow.addClass('l-tipArrow-topBottom');
 				var tipArrowH = tipArrow.height(),
 					tipArrowW = tipArrow.width();
@@ -462,11 +497,12 @@ zUI.ui.tip = function(options){
 
 
 /**
- * @name 弹出框插件 v1.0
+ * 弹出框插件
+ * @constructor zUI.ui.pop
+ * @extends zUI.ui
+ * @requires zUI.base
  * @author norion
  * @blog http://zkeyword.com/
- * @update 2013.04.2
- * @param {object} options
  * @example 
 	$('#s').click(function(){
 		zUI.ui.pop.open({
@@ -476,6 +512,11 @@ zUI.ui.tip = function(options){
 	});
  */
 zUI.ui.pop = {
+
+	/**
+	* 初始化弹出框
+	* @member zUI.ui.pop
+	*/
 	open: function(options){
 		var o = options || {};
 		var id            = o.id || 'l-pop-'+(new Date()).valueOf(),
@@ -615,9 +656,12 @@ zUI.ui.pop = {
 		}
 	},
 	
-	/*修改弹出框大小*/
+	/**
+	* 修改弹出框大小
+	* @member zUI.ui.pop
+	*/
 	modifyWrap: function(id,height,type){
-		if( type == 'iframe' ){
+		if( type === 'iframe' ){
 			var pop = $('#'+id,window.parent.document).find('.l-pop-contentIframe').height(height)
 													  .find('#l-pop-iframe').height(height);
 		}else{
@@ -625,7 +669,10 @@ zUI.ui.pop = {
 		}
 	},
 	
-	/*关闭释放*/
+	/**
+	* 关闭释放
+	* @member zUI.ui.pop
+	*/
 	close: function(id){
 		if(id){
 			$('#'+id).remove();
@@ -638,19 +685,14 @@ zUI.ui.pop = {
 	}
 };
 
+
 /**
- * @name 对话框插件 v1.0
+ * 对话框插件
+ * @constructor zUI.ui.dialog
+ * @extends zUI.ui
+ * @requires zUI.base
  * @author norion
  * @blog http://zkeyword.com/
- * @update 2013.04.07
- * @param {object} options
- * @example 
-	$('#s').click(function(){
-		zUI.ui.pop.open({
-			title:'标题',
-			html:'111111'
-		});
-	});
  */
 zUI.ui.dialog = {
 	init: function(options){
@@ -800,7 +842,7 @@ zUI.ui.dialog = {
 			var _modalKey = function (e){
 				e = e || event;
 				var code = e.which || event.keyCode;
-				if(code == 27){
+				if(code === 27){
 					zUI.ui.dialog.close(id);
 				}
 			};
@@ -813,7 +855,10 @@ zUI.ui.dialog = {
 		}
 	},
 	
-	/*关闭释放*/
+	/**
+	* 关闭释放
+	* @member zUI.ui.dialog
+	*/
 	close: function(id){
 		if( id ){
 			$('#'+id).remove();
@@ -825,7 +870,10 @@ zUI.ui.dialog = {
 		}
 	},
 	
-	/*alert*/
+	/**
+	* alert
+	* @member zUI.ui.dialog
+	*/
 	alert: function(options){
 		var o     = options || {},
 			title = o.title || '提示',
@@ -839,7 +887,10 @@ zUI.ui.dialog = {
 		});
 	},
 	
-	/*confirm*/
+	/**
+	* confirm
+	* @member zUI.ui.dialog
+	*/
 	confirm: function(options){
 		var o     = options || {},
 			title = o.title || '确认？',
@@ -855,7 +906,10 @@ zUI.ui.dialog = {
 		});
 	},
 	
-	/*error*/
+	/**
+	* error
+	* @member zUI.ui.dialog
+	*/
 	error: function(options){
 		var o     = options || {},
 			title = o.title || '',
@@ -869,7 +923,10 @@ zUI.ui.dialog = {
 		});
 	},
 	
-	/*小提示框*/
+	/**
+	* 小提示框
+	* @member zUI.ui.dialog
+	*/
 	prompt: function(options){
 		var o        = options || {},
 			id       = o.id || 'l-dialog-' + (new Date()).valueOf(),
@@ -907,7 +964,7 @@ zUI.ui.dialog = {
 		//关闭
 		function show(){
 			zUI.ui.dialog.close(id);
-			if( endFn && typeof endFn == 'function' ){
+			if( endFn && typeof endFn === 'function' ){
 				endFn();
 			}
 		};
@@ -916,11 +973,14 @@ zUI.ui.dialog = {
 	}
 };
 
+
 /**
- * @name 表单
+ * 表单
+ * @class zUI.ui.form
+ * @extends zUI.ui
+ * @requires zUI.base
  * @author norion
  * @blog http://zkeyword.com/
- * @update 2013.04.16
  */
 zUI.ui.form = {
 	/**
@@ -979,7 +1039,7 @@ zUI.ui.form = {
 			/*iframe 在提交完成之后*/
 			iframe.load(function() {
 				var data = $(this).contents().find('body').html().match(/\{.+?\}/);
-				if( dataType == 'json' ){
+				if( dataType === 'json' ){
 					data = window.eval('(' + data + ')');
 				}
 				onComplate(data);
@@ -1007,11 +1067,12 @@ zUI.ui.form = {
 
 
 /**
- * @name placeholder兼容插件 v1.3
+ * placeholder兼容插件
+ * @constructor zUI.ui.selectArea
+ * @extends zUI.ui
+ * @requires zUI.base
  * @author norion
  * @blog http://zkeyword.com/
- * @update 2013.03.31
- * @param {object} options
  * @example 
    zUI.ui.placeholder({
 	   inputObj:'#input'
@@ -1028,15 +1089,15 @@ zUI.ui.placeholder = function(options){
 		if( isIE ){
 			inputObj.removeAttr('placeholder').val(searchValue).die().live({
 				focus:function(){
-					if ( inputObj.val() == searchValue ) { inputObj.val(''); };
+					if ( inputObj.val() === searchValue ) { inputObj.val(''); };
 				},blur:function(){
-					if ( inputObj.val() == '' ){ inputObj.val(searchValue); };
+					if ( inputObj.val() === '' ){ inputObj.val(searchValue); };
 				}
 			});
 		}else{
 			inputObj.die().live({
 				focus:function(){
-					if ( inputObj.attr('placeholder') == searchValue ){ inputObj.attr('placeholder',''); };
+					if ( inputObj.attr('placeholder') === searchValue ){ inputObj.attr('placeholder',''); };
 				},blur:function(){
 					if ( inputObj.attr('placeholder','') ){ inputObj.attr('placeholder',searchValue); };
 				}
@@ -1045,7 +1106,14 @@ zUI.ui.placeholder = function(options){
 	}
 };
 
-/*地区切换*/
+/**
+ * 地区切换
+ * @constructor zUI.ui.selectArea
+ * @extends zUI.ui
+ * @requires zUI.base
+ * @author norion
+ * @blog http://zkeyword.com/
+ */
 zUI.ui.selectArea = function(options){
 	var o = options || {};
 	if(!o.wrap){return;}
@@ -1063,13 +1131,15 @@ zUI.ui.selectArea = function(options){
 				initProvinceName  = '',
 				initCityName      = '',
 				initCityData      = '',
-				initCityHtml      = '';
-			for(var i = 0, l = initData.length; i < l; i++){
+				initCityHtml      = '',
+				i                 = 0,
+				l                 = initData.length;
+			for(; i < l; i++){
 				if( initData[i].Province == initProvinceValue ){
 					initProvinceName = initData[i].ProvinceName;
 					initCityData     = initData[i];
 					for(var j = 0,c = initCityData.CityArray.length; j < c; j++){
-						if( initCityData.CityArray[j].City == initCityValue ){
+						if( initCityData.CityArray[j].City === initCityValue ){
 							initCityName = initCityData.CityArray[j].CityName;
 						}
 						initCityHtml += '<div class="l-selectArea-city-item" value="'+initCityData.CityArray[j].City+'">'+ initCityData.CityArray[j].CityName +'</div>';
@@ -1212,10 +1282,18 @@ zUI.ui.selectArea = function(options){
 	selectAreaFn.init();
 };
 
-/*小功能*/
+/**
+ * 小功能
+ * @class zUI.app
+ * @extends zUI.ui
+ * @requires zUI.base
+ * @author norion
+ * @blog http://zkeyword.com/
+ */
 zUI.app = {
 	/**
-	 * @name 向上切换
+	 * 向上切换
+	 * @member zUI.app
 	 * @example 
 		zUI.app.marqueeUp('#index-shortcutBox');
 		dom: 
@@ -1247,19 +1325,26 @@ zUI.app = {
 		}).trigger('mouseleave');//函数载入时,模拟执行mouseleave,即自动滚动
 	},
 	
-	/*带箭头的图标滚动*/
+	/**
+	* 带箭头的图标滚动
+	* @member zUI.app
+	*/
 	pictureScroll: function(options){
 		
 	},
 	
-	/*向上滚动幻灯片*/
+	/**
+	* 带箭头的图标滚动
+	* @member zUI.app
+	*/
 	slidesUp: function(options){
 		
 	},
 	
 	/**
-	 * @name 懒加载
-	 * @example 
+	* 懒加载
+	* @member zUI.app
+	* @example 
 		zUI.app.lazyload({
 			defObj:'.home_main',
 			defHeight:50
@@ -1274,7 +1359,7 @@ zUI.app = {
 		d = $.extend(d, e || {});
 		var c = d.defHeight,
 			ipad = zUI.base.browser.ipad;
-		h = (typeof d.defObj == "object") ? d.defObj.find("img") : $(d.defObj).find("img");
+		h = (typeof d.defObj === "object") ? d.defObj.find("img") : $(d.defObj).find("img");
 		var b = function(){
 			var i = document,
 			j = ipad ? window.pageYOffset : Math.max(i.documentElement.scrollTop, i.body.scrollTop);
@@ -1312,13 +1397,16 @@ zUI.app = {
 };
 
 /**
- * @name grid插件
+ * grid插件
+ * @class zUI.ui.BaseGrid
+ * @constructor
+ * @extends zUI.ui
+ * @requires zUI.base
  * @author norion
  * @blog http://zkeyword.com/
  * @update 2013.07.24
- * @param {object} options
  * @example 
-	zUI.ui.grid.init({
+	zUI.ui.grid({
 		wrap:'#wrap',
 		data: AllOrdersData,
 		columns: [
@@ -1340,13 +1428,26 @@ zUI.app = {
 		zUI.ui.grid.reflash(gridData2)
 	});
  */
-zUI.ui.baseGrid = function(){
-
+zUI.ui.BaseGrid = function(){
 	var g       = this,
-		records = [],
+	
+		/**
+		* 全局已选记录
+		* @private
+		*/
+		_records = {
+			rowSelected: [],
+			detailSelected: []
+		},
+		
+		/**
+		* 内部对象
+		* @private
+		*/
 		_core   = {
 			/**
 			* 内部表格表头内容
+			* @method tHeadFn
 			* @param {object} init 和 reflash共享的对象
 			*/
 			tHeadFn: function(options){
@@ -1361,7 +1462,7 @@ zUI.ui.baseGrid = function(){
 				s += '<div class="l-grid-header"><table style="width:'+ width +'px">';
 				s += '<tr>';
 				if( detail ){
-					s += '<th><div class="l-grid-row-cell-inner"><span class="l-detailbtn l-grid-row-detailbtn"></span></div></th>';
+					s += '<th><div class="l-grid-row-cell-inner"><span class="l-detailbtn"></span></div></th>';
 				}
 				if( checkbox ){
 					s += '<th><div class="l-grid-hd-cell-inner"><span class="l-checkbox l-grid-hd-checkbox"></span></div></th>';
@@ -1375,6 +1476,7 @@ zUI.ui.baseGrid = function(){
 			},
 			/**
 			* 内部表格主体内容
+			* @method tBodyFn
 			* @param {object} init 和 reflash共享的对象
 			*/
 			tBodyFn: function(options){
@@ -1395,7 +1497,7 @@ zUI.ui.baseGrid = function(){
 					if( data[pageStar] ){
 						s += '<tr>';
 						if( detail ){
-							s += '<td><div class="l-grid-row-cell-inner"><span class="l-detailbtn l-grid-row-detailbtn"></span></div></td>';
+							s += '<td><div class="l-grid-row-cell-inner"><span class="l-detailbtn l-grid-row-detailbtn l-detailbtn-close"></span></div></td>';
 						}
 						if( checkbox ){
 							s += '<td><div class="l-grid-row-cell-inner"><span class="l-checkbox l-grid-row-checkbox"></span></div></td>';
@@ -1410,9 +1512,9 @@ zUI.ui.baseGrid = function(){
 						}
 						s += '</tr>';
 						if( detail.render !== undefined ){
-							var str    = detail.render(),
+							var str    = detail.render(data[pageStar], pageStar),
 								colLen = columns.length + (checkbox ? 1 : 0) + 1;
-							s += '<tr><td colspan="'+ colLen +'"><div class="l-grid-row-cell-detail">'+ str +'</div></td></tr>';
+							s += '<tr class="l-grid-row-cell-detail"><td colspan="'+ colLen +'">'+ str +'</td></tr>';
 						}
 					}
 				}
@@ -1422,6 +1524,7 @@ zUI.ui.baseGrid = function(){
 			
 			/**
 			* 内部分页函数
+			* @method pagerFn
 			* @param {object} init 和 reflash共享的对象
 			*/
 			pagerFn: function(options){
@@ -1442,13 +1545,14 @@ zUI.ui.baseGrid = function(){
 					
 					/**
 					* 获取数字连接
+					* @private
 					* @param {Number} 当前位置
 					* @param {Number} 
 					* @param {String} 上下翻页的文本
 					*/
 					_getLink    = function(index, pageNum, txt){
 						var s       = '',
-							current = txt ? (index == pageNum ? ' class="on"' : '') : '',
+							current = txt ? (index === pageNum ? ' class="on"' : '') : '',
 							txt     = txt || index;
 							
 						s += '<a href="#p'+ index +'" page="'+ index +'"' 
@@ -1458,6 +1562,7 @@ zUI.ui.baseGrid = function(){
 					
 					/**
 					* 获取显示的数据
+					* @private
 					* @param {Number} 每页显示条数
 					* @param {Number} 数据长度
 					* @param {Number} 当前位置
@@ -1472,6 +1577,7 @@ zUI.ui.baseGrid = function(){
 					
 					/**
 					* 获取分页按钮
+					* @private
 					* @param {Number} 每页显示条数
 					* @param {Number} 数据长度
 					* @param {Number} 当前位置
@@ -1493,7 +1599,7 @@ zUI.ui.baseGrid = function(){
 							begin = index - itemNum;
 						}
 						end = Math.min(pageNum, begin + itemNum * 2);
-						if(end == pageNum - 1){
+						if(end === pageNum - 1){
 							end = pageNum;
 						}
 						for(i = begin; i <= end; i++) {
@@ -1508,8 +1614,21 @@ zUI.ui.baseGrid = function(){
 							s += '<span>下一页</span> ';
 						}
 						return s;
+					},
+					
+					/**
+					* 设置是否记录选择框的选择结果
+					* @private
+					*/
+					_setMemory  = function(){
+						if( !isMemory ){
+							_records.rowSelected = []; //修改选中的数组值
+						}else{
+							_core.initCheckbox(options, _records.rowSelected); //初始化选中状态
+						}
 					};
-								
+					
+
 				/*分页统计*/
 				html += '<div class="l-grid-footer-pager-msg">'+ _getCount(pageSize, count, pageIndex) +'</div>';
 				
@@ -1518,6 +1637,9 @@ zUI.ui.baseGrid = function(){
 				
 				/*生成分页*/
 				pager.html(html);
+				
+				/*初始化records.rowSelected*/
+				_setMemory();
 				
 				/*分页事件*/
 				pager.find('.l-grid-footer-pager-btn a').die().live('click',function(){
@@ -1537,7 +1659,7 @@ zUI.ui.baseGrid = function(){
 							onPageFn(index, pageSize);
 						}
 					}
-
+					
 					/*重载html*/
 					gridBody.html( _core.tBodyFn(options) );
 					gridpageMsg.html( _getCount(pageSize, count, index) );
@@ -1550,25 +1672,14 @@ zUI.ui.baseGrid = function(){
 						gridHeader.find('.l-checkbox').removeClass('l-checkbox-selected');
 					}
 					
-					/*是否记录选择框的选择结果*/
-					if( !isMemory ){
-						records = []; //修改选中的数组值
-					}else{
-						_core.initCheckbox(options, records); //初始化选中状态
-					}
+					/*修改records.rowSelected*/
+					_setMemory();
 				});
-				
-				/*是否记录选择框的选择结果*/
-				if( !isMemory ){
-					records = []; //修改选中的数组值
-				}else{
-					_core.initCheckbox(options, records); //初始化选中状态
-				}
-
 			},
 			
 			/**
 			* 内部获取行数据
+			* @method getRowData
 			* @param {Object} init 和 reflash共享的对象
 			* @param {Number} 记录的索引值
 			*/
@@ -1584,6 +1695,7 @@ zUI.ui.baseGrid = function(){
 			
 			/**
 			* 初始化选择框
+			* @method initCheckbox
 			* @param {object} init 和 reflash共享的对象
 			*/
 			initCheckbox: function(options, selectedRecords){
@@ -1606,13 +1718,14 @@ zUI.ui.baseGrid = function(){
 				}
 
 				/*全部选上时给表头全选*/
-				if( gridBody.find('.l-checkbox-selected').length == selected ){
+				if( gridBody.find('.l-checkbox-selected').length === selected ){
 					gridHeader.find('.l-checkbox').addClass('l-checkbox-selected');
 				}
 			},
 			
 			/**
 			* 选择框事件
+			* @method checkboxFn
 			* @param {object} init 和 reflash共享的对象
 			*/
 			checkboxFn: function(options){
@@ -1639,14 +1752,14 @@ zUI.ui.baseGrid = function(){
 										
 					if( !self.hasClass('l-checkbox-selected') ){
 						self.addClass('l-checkbox-selected');
-						records[i] = _core.getRowData(options, i);
+						_records.rowSelected[i] = _core.getRowData(options, i);
 
 						/*全部选上时给表头全选*/
-						if( gridBody.find('.l-checkbox-selected').length == selected ){
+						if( gridBody.find('.l-checkbox-selected').length === selected ){
 							gridHeader.find('.l-checkbox').addClass('l-checkbox-selected');
 						}
 					}else{
-						records.splice(i, 1, null); //赋一个null值，站位，防bug
+						_records.rowSelected.splice(i, 1, null); //赋一个null值，站位，防bug
 						self.removeClass('l-checkbox-selected');
 						gridHeader.find('.l-checkbox').removeClass('l-checkbox-selected');
 					}
@@ -1677,13 +1790,13 @@ zUI.ui.baseGrid = function(){
 						self.addClass('l-checkbox-selected');
 						checkbox.addClass('l-checkbox-selected');
 						for(; i < len; i++){
-							records[i] = _core.getRowData(options, i);
+							_records.rowSelected[i] = _core.getRowData(options, i);
 						}
 					}else{
 						self.removeClass('l-checkbox-selected');
 						checkbox.removeClass('l-checkbox-selected');
 						for(; j > -1; j--){
-							records.splice(j, 1);
+							_records.rowSelected.splice(j, 1);
 						}
 					}
 					
@@ -1692,38 +1805,83 @@ zUI.ui.baseGrid = function(){
 						onCheckFn();
 					}
 				});
+			},
+			
+			/**
+			* 明细按钮事件
+			* @method detailBtnFn
+			* @param {object} init 和 reflash共享的对象
+			*/
+			detailBtnFn: function(options){
+				var id         = options.id,                  //表格ID
+					grid       = $('#'+id),
+					gridBody   = grid.find('.l-grid-body'),   //表格主体
+					isMemory   = options.isMemory,            //是否记住选择
+					onCheckFn  = options.onCheckFn;           //点击后执行
+					
+				gridBody.find('.l-detailbtn').live('click',function(){
+					var self = $(this),
+						next = self.parents('tr').next('.l-grid-row-cell-detail');
+					
+					if( self.hasClass('l-detailbtn-close') ){
+						self.removeClass('l-detailbtn-close');
+						next.show();
+					}else{
+						self.addClass('l-detailbtn-close');
+						next.hide();
+					}
+				});
 			}
 		}
 	
 	/**
 	* 表格初始化
-	* @param {Object} 页面传过来的对象
-	* @return {Object} 表格对象
+	* @member zUI.ui.BaseGrid
+	* @param {Object} options 页面传过来的对象
+	* @param {Object} options.data json数据源
+	* @param {Object} options.columns 表格列信息
+	* @param {String} options.wrap 收纳表格的容器
+	* @param {String} options.id 表格ID
+	* @param {Object} options.bottomBtns 底部按钮
+	* @param {Boolean} options.isPager 是否分页
+	* @param {Number} options.pageSize 每页显示条数
+	* @param {Number} options.pageIndex 默认当前页
+	* @param {Function} options.onPageFn 击分页加载的事件
+	* @param {Boolean} options.checkbox 是否有checkbox
+	* @param {Boolean} options.onCheckFn 选择事件(复选框)
+	* @param {Number} options.width 表格总宽度
+	* @param {Boolean} options.isMemory 翻页是否记住选择记录
+	* @param {Boolean} options.isPageCache 翻页是否缓存数据
+	* @param {String} options.nullText 数据为空时的提示文本
+	* @param {Object} options.detail 表格详细
+	* @return {Object} zUI.ui.baseGrid
 	*/
-	g.init = function(o){
+	this.init = function(o){
 		if(!o){return false;}
 		var options = {
-				data:         o.data || {},                                     //json数据源
-				columns:      o.columns || {},                            //表格列信息
-				wrap:         $(o.wrap),                                  //收纳表格的容器
-				id:           o.id || 'l-grid-' + (new Date()).valueOf(), //表格ID
-				bottomBtns:   o.bottomBtns || {},                         //底部按钮
-				isPager:      o.isPager ? false : true,                   //是否分页
-				pageIndex:    o.pageIndex || 1,                           //默认当前页
-				pageSize:     o.pageSize || 10,                           //每页显示条数
-				onPageFn:     o.onPageFn,                                 //点击分页加载的事件
-				checkbox:     o.checkbox ? true : false,                  //是否有checkbox
+				data:         o.data || {},
+				columns:      o.columns || {},
+				wrap:         $(o.wrap),
+				id:           o.id || 'l-grid-' + (new Date()).valueOf(),
+				bottomBtns:   o.bottomBtns || {},
+				isPager:      o.isPager ? false : true,
+				pageIndex:    o.pageIndex || 1,
+				pageSize:     o.pageSize || 10,
+				onPageFn:     o.onPageFn,
+				checkbox:     o.checkbox ? true : false,
 				width:        o.width || 'auto',
-				onCheckFn:    o.onCheckFn || null,                        //选择事件(复选框)
-				isMemory:     o.isMemory ? false : true,                  //翻页是否记住选择记录
-				isPageCache:  o.isPageCache ? false : true,               //翻页是否缓存数据
-				nullText:     o.nullText ? o.nullText : '',               //数据为空时的提示文本
+				onCheckFn:    o.onCheckFn || null,
+				isMemory:     o.isMemory ? false : true,
+				isPageCache:  o.isPageCache ? false : true,
+				nullText:     o.nullText ? o.nullText : '',
 				detail:       o.detail || {}
 			};
 					
 		/*复制options共享g.o对象*/
 		for(var key in options){
-			g.o[key] = options[key];
+			if( options.hasOwnProperty(key) ){
+				g.o[key] = options[key];
+			}
 		}
 		
 		/*生成表格*/
@@ -1763,13 +1921,12 @@ zUI.ui.baseGrid = function(){
 				/*按钮*/
 				if( gridFooter.find('.l-grid-footer-btns') ){
 					var gridFooterBtn = gridFooter.find('.l-grid-footer-btns'),
-						tFootBtnArr   = [],
 						btnData       = options.bottomBtns;
 
 					$.each(btnData, function(i, item){
 						gridFooterBtn.append('<a href="#btn" id="'+ item.id +'" class="l-btn ui-btn"><span class="ui-btnItem">'+ item.text +'</span></a>')
 						item.onclick && gridFooterBtn.find('.l-btn').eq(i).click(function(){
-							item.onclick(i,item);
+							item.onclick(i, item);
 						});
 					});
 				}
@@ -1779,35 +1936,37 @@ zUI.ui.baseGrid = function(){
 									
 					/*翻页缓存*/
 					if(	options.isPageCache ){
-						var i   = 0,
-							len = options.data.Total;
-							
 						g.o.cache = [];  //给g.o添加一个cache成员
-						for(; i < len; i++){
-							g.o.cache[i] = null;
-						}
+						g.o.cache[options.pageIndex] = true;
 					};
+					
 					_core.pagerFn(g.o);
 				}
 			
 			/*选择框*/
 			_core.checkboxFn(g.o);
 			
+			/*明细*/
+			_core.detailBtnFn(g.o);
 
 		return g;
 	};
 	
 	/**
 	* 表格全局数据源
+	* @member zUI.ui.BaseGrid
 	*/
-	g.o = {};		
+	this.o = {};
 	
 	/**
 	* 表格刷新数据源
+	* @member zUI.ui.BaseGrid
+	* @param {Object} 数据源
 	* @param {Number} 页面值索引
-	* @param {Object} init 和 reflash共享的对象，有缓存就不用传值了
+	* @param {Boolean} 是否缓存
+	* @return {Object} zUI.ui.BaseGrid
 	*/
-	g.reflash = function(data, index){
+	this.reflash = function(data, index, cache){
 		var options   = g.o,
 			columns   = options.columns || {},
 			wrap      = $(options.wrap),
@@ -1817,11 +1976,10 @@ zUI.ui.baseGrid = function(){
 			grid      = $('#'+id),
 			gridBody  = grid.find('.l-grid-body');
 		
-		if( index ){
+		if( cache ){
 			/*缓存已翻页数据，与_core.pageFn配合*/
 			var arr  = [],
-				//len  = index*pageSize,       //翻页后总长
-				star = (index - 1)*pageSize, //当前页的起始位置
+				star = (index - 1) * pageSize, //当前页的起始位置
 				i    = 0,
 				n    = 0;
 
@@ -1838,14 +1996,17 @@ zUI.ui.baseGrid = function(){
 					star++;
 				}
 			}
-			
+
 			options.pageIndex = index;
 			options.data.Rows = arr;
 			options.cache[index] = true;
 		}else{
-			/*无指定索引，一次性刷新表格主体*/
 			var tBodyHtml = '';
-			options.pageIndex = 1;
+			
+			/*index不存在默认pageIndex*/
+			if(index){
+				options.pageIndex = index;
+			}
 			options.data = data;
 			tBodyHtml = _core.tBodyFn(options);
 			gridBody.html(tBodyHtml);
@@ -1860,20 +2021,20 @@ zUI.ui.baseGrid = function(){
 	};
 		
 	/**
-	* 表格选中后的数据源
+	* @member zUI.ui.BaseGrid
 	* @return {Object} 返回一个表格数据源
 	*/
-	g.getSelectData = function(){
+	this.getSelectData = function(){
 		var arr   = [],
 			i     = 0,                
-			len   = records.length, //记录的长度
+			len   = _records.rowSelected.length, //记录的长度
 			data  = {},             //data对象
 			total = 0;              //data个数
 			
 		/*过滤掉records下面的空元素*/
 		for(; i < len; i++){
-			if( records[i] ){
-				arr.push(records[i])
+			if( _records.rowSelected[i] ){
+				arr.push( _records.rowSelected[i] );
 			}
 		}
 		
@@ -1888,5 +2049,5 @@ zUI.ui.baseGrid = function(){
 	};
 	
 }
-zUI.ui.baseGrid = new zUI.ui.baseGrid();
-zUI.ui.grid = zUI.ui.baseGrid.init;
+zUI.ui.BaseGrid = new zUI.ui.BaseGrid();
+zUI.ui.grid = zUI.ui.BaseGrid.init;

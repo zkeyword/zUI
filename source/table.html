@@ -26,6 +26,7 @@
 <script src="js/CustomersData3.js" type="text/javascript"></script>
 <script src="js/CustomersData4.js" type="text/javascript"></script>
 <script src="js/CustomersData5.js" type="text/javascript"></script>
+<script src="js/CustomersData6.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(function(){
 	var girds = zUI.ui.grid({
@@ -67,27 +68,27 @@ $(function(){
 			/*模拟点击请求数据*/
 			if( index == 1 ){
 				if(cache){
-					girds.reflash(null, index);
+					girds.reflash(null, index, true);
 				}else{
-					girds.reflash(CustomersData, index);
+					girds.reflash(CustomersData, index, true);
 				}
 			}else if( index == 2 ){
 				if(cache){
-					girds.reflash(null, index);
+					girds.reflash(null, index, true);
 				}else{
-					girds.reflash(CustomersData2, index);
+					girds.reflash(CustomersData2, index, true);
 				}
 			}else if( index == 3 ){
 				if(cache){
-					girds.reflash(null, index);
+					girds.reflash(null, index, true);
 				}else{
-					girds.reflash(CustomersData3, index);
+					girds.reflash(CustomersData3, index, true);
 				}
 			}else{
 				if(cache){
-					girds.reflash(null, index);
+					girds.reflash(null, index, true);
 				}else{
-					girds.reflash(CustomersData4, index);
+					girds.reflash(CustomersData4, index, true);
 				}
 			}
 		},
@@ -96,7 +97,20 @@ $(function(){
 		},
 		detail: {
 			onShowDetail:function(){},
-			render:function(){
+			render:function(parentItem, parentItemIndex){
+				var details    = CustomersData5.Rows,
+					detailsArr = [];
+				
+				for(var i = 0; i < details.length; i++){
+					//if( details[i].CustomerID == details[i].CustomerID ){
+						//detailsArr
+					//}
+				}
+
+				//for(var i=0; i < details.length; i++){
+				//	details[i] = CustomersData5.Rows[parentItemIndex].CustomerID;
+				//}
+				console.log( details );
 				return '详细';
 			}
 		}
