@@ -1,33 +1,44 @@
-/**
- * zUI
- * @author norion
- * @blog http://zkeyword.com/
- */
-
 'use strict';
 
 (function() {
-	/*针对原型的方法添加应用支持*/
+	/**
+	 * 针对原型的方法添加应用支持
+	 */
 	
-	//获取中文长度
+	/**
+	 * 获取中文长度
+	 */
 	String.prototype.getLength = function(){
 		return this.replace(/[^\x00-\xff]/g, "en").length; //若为中文替换成两个字母
 	};
 	
-	//清空空格
+	/**
+	 * 清空空格
+	 */
 	String.prototype.trim = function(){
 		return this.replace(/^[\s\xa0\u3000]+|[\u3000\xa0\s]+$/g, "");
 	};
 	
-	//unicode互转
+	/**
+	 * 转为unicode编码
+	 */
 	String.prototype.toUnicode = function(){
 		return escape( this.toLocaleLowerCase().replace(/%u/gi, '\\') );
 	};
+	
+	/**
+	 * 转为unicode编码
+	 */
 	String.prototype.unicodeTo = function(){
 		return unescape( this.toLocaleLowerCase().replace(/%u/gi, '\\') );
 	};
 	
-	/*设定基本命名空间*/
+	/**
+	 * zUI
+	 * @namespace设定基本命名空间
+	 * @author norion
+	 * @blog http://zkeyword.com/
+	 */
 	var zUI = window.zUI || {};
 
 	/*设定基本构架*/
@@ -47,27 +58,54 @@
 
 /**
  * zUI.base基础层
- * @class zUI.base
+ * @class zUI.base 基础层,所有的基础函数库,如cookie等
  * @requires zUI.base
  * @author norion
  * @blog http://zkeyword.com/
  */
 zUI.base = {
+
+	/**
+	 * 设置地址
+	 * @return {String}
+	 */
 	domain: {
 		url: 'http://127.0.0.1'
 	},
-	/*重写console，以防止在IE下出错*/
+	
+	/**
+	 * 重写console，以防止在IE下出错
+	 * @param {Object} 需要打印的对象
+	 */
 	log: function(msg){
 		if (window["console"]){
 			console.log(msg);
 		}
 	},
+	
+	/**
+	 * 判断是否是数组
+	 * @param {Object} 
+	 * @return {Boolean}
+	 */
 	isArray: function(o){
 		return o ? jQuery.isArray(o) : false;
 	},
+	
+	/**
+	 * 判断是否是对象
+	 * @param {Object} 
+	 * @return {Boolean}
+	 */
 	isObject: function(o){
 		return o ? Object.prototype.toString.call(o) === "[object Object]" : false;
 	},
+	
+	/**
+	 * 判断是否是函数
+	 * @param {Function} 
+	 * @return {Boolean}
+	 */
 	isFunction: function(o){
 		return o ? Object.prototype.toString.call(o) === "[object Function]" : false;
 	}
@@ -116,6 +154,16 @@ if( zUI.base.browser.ie6 ) {
  * @blog http://zkeyword.com/
  */
 zUI.base.cookie = {
+
+	/**
+	 * 设置cookie
+	 * @param {String} cookie的名称
+	 * @param {String} cookie的值
+	 * @param {String} cookie的域名
+	 * @param {String} cookie存放的路径
+	 * @param {String} cookie的有效期
+	 * @return {Boolean}
+	 */
     set: function (name, value, domain, path, hour) {
 		if (hour) {
 			var today  = new Date(),
@@ -125,11 +173,24 @@ zUI.base.cookie = {
 		document.cookie = name + "=" + escape(value) + "; " + (hour ? "expires=" + expire.toGMTString() + "; " : "") + (path ? "path=" + path + "; " : "path=/; ") + (domain ? "domain=" + domain + ";" : "");
 		return true;
 	},
+	
+	/**
+	 * 获取cookie
+	 * @param {String} cookie的名称
+	 * @return {String} cookie的值
+	 */
 	get: function (name) {
 		var r = new RegExp("(?:^|;+|\\s+)" + name + "=([^;]*)"),
 			m = document.cookie.match(r);
 		return unescape(decodeURI(!m ? "" : m[1]));
 	},
+	
+	/**
+	 * 删除cookie
+	 * @param {String} cookie的名称
+	 * @param {String} cookie的域名
+	 * @param {String} cookie存放的路径
+	 */
 	del: function (name, domain, path) {
 		document.cookie = name + "=; expires=Mon, 26 Jul 1997 05:00:00 GMT; " + (path ? "path=" + path + "; " : "path=/; ") + (domain ? "domain=" + domain + ";" : "");
 	}
@@ -137,48 +198,68 @@ zUI.base.cookie = {
 
 /**
  * zUI.ui前端显示层
- * @class zUI.ui
+ * @class zUI.ui 前端显示层,用来重构和回流DOM,前端的特效显示处理
  * @requires zUI.base
  * @author norion
  * @blog http://zkeyword.com/
  */
 zUI.ui = {
-	/*标识ID*/
+
+	/**
+	 * 设置标识ID
+	 */
 	uniqueId: function(){
 		
 	},
 	
-	/*z-index*/
+	/**
+	 * css中的z-index值
+	 * @return {Number} z-index值
+	 */
 	zIndex: function(){
 		return 9999 + $('.l-ui').length;
 	},
 	
-	/*需要ui元素需要绝对定位的容器*/
+	/**
+	 * 需要ui元素需要绝对定位的容器
+	 */
 	wrap: function(){
 		if( !$('#l-ui-wrap').length ){
 			$('body').append('<div id="l-ui-wrap"><!--[if lte IE 6.5]><iframe src="javascript:false;" style="width:0;height:0;"></iframe><![endif]--></div>');
 		}
 	},
 	
-	/*遮罩*/
+	/**
+	 * 设置遮罩
+	 */
 	lock: function(){
 		var body = $('body'),
 			bodyW = body.width(),
 			bodyH = $(document).height();
+			
 		if( !$('.l-ui-lock').length ){
 			body.append('<div class="l-ui-lock"></div>')
 				.find('.l-ui-lock').css({ width:bodyW, height:bodyH, filter:'Alpha(opacity=20)' });
 		}else{
 			$('.l-ui-lock').show();
 		}
+		
 		//给.l-ui添加遮罩标识
 		$('.l-ui').addClass('l-ui-mask');
 	},
+	
+	/**
+	 * 删除遮罩
+	 */
 	unlock: function(){
 		$('.l-ui-lock').hide();
 	},
 	
-	/*鼠标位置*/
+	/**
+	 * 获取鼠标位置
+	 * @param {Object} 事件
+	 * @return {Array} 返回鼠标的x、y轴：[positionX, positionY]
+	 */
 	mousePosition: function(b) {
 		var b = b || window.event,
 			d = b.pageX || b.clientX + document.body.scrollLeft,
@@ -189,7 +270,10 @@ zUI.ui = {
 		};
 	},
 	
-	/*宽屏*/
+	/**
+	 * 判断是否宽屏
+	 * @return {Boolean} 
+	 */
 	Widescreen: (function(){
 		return (screen.width >= 1210);
 	})()
@@ -210,12 +294,14 @@ zUI.ui = {
    });
  */
 zUI.ui.drag = function(options){
+
 	var o = options || {};
 	if( !o.dragItem ) return false;
 	var	dragItem = $('body').find(o.dragItem),
 		dragWrap = $('body').find(o.dragWrap),
 		win      = parent.document || document,
 		mouse    = {x:0,y:0};
+		
 	function _moveDialog(event){
         var e    = window.event || event,
         	top  = parseInt(dragWrap.css('top')) + (e.clientY - mouse.y),
@@ -255,6 +341,7 @@ zUI.ui.drag = function(options){
 	});
  */
 zUI.ui.tab = function(options){
+
 	var o = options || {};
 	if( !o.tabItem ) return false;
 	var tabItem   = o.tabItem,                          //tab选卡对象
@@ -1106,6 +1193,7 @@ zUI.ui.placeholder = function(options){
 	}
 };
 
+
 /**
  * 地区切换
  * @constructor zUI.ui.selectArea
@@ -1282,119 +1370,128 @@ zUI.ui.selectArea = function(options){
 	selectAreaFn.init();
 };
 
+
 /**
- * 小功能
- * @class zUI.app
- * @extends zUI.ui
+ * 常用功能
+ * @class zUI.app 一些常用的小功能，如加入收藏夹之类
  * @requires zUI.base
  * @author norion
  * @blog http://zkeyword.com/
  */
-zUI.app = {
-	/**
-	 * 向上切换
-	 * @member zUI.app
-	 * @example 
-		zUI.app.marqueeUp('#index-shortcutBox');
-		dom: 
-			<div id="index-shortcutBox">
-				<ul class="fn-clear">
-					<li><a href="/portal/service/advisory.jsp" class="index-shortcutBox-item index-shortcutBox-item1">融资咨询</a></li>
-					<li><a href="/portal/service/displayService.jsp" class="index-shortcutBox-item index-shortcutBox-item2">展览服务</a></li>
-				</ul>
-				<ul class="fn-clear">
-					<li><a href="/portal/service/managementService.jsp" class="index-shortcutBox-item index-shortcutBox-item9">管理咨询</a></li>
-				</ul>
-			</div>
-	*/
-	marqueeUp: function(obj){
-		//多行应用@Mr.Think
-		var _wrap = $(obj);//定义滚动区域
-		var _interval=3000;//定义滚动间隙时间
-		var _moving;//需要清除的动画
-		_wrap.hover(function(){
-			clearInterval(_moving);//当鼠标在滚动区域中时,停止滚动
-		},function(){
-			_moving=setInterval(function(){
-				var _field=_wrap.find('ul:first');//此变量不可放置于函数起始处,li:first取值是变化的
-				var _h=_field.height();//取得每次滚动高度
-				_field.animate({marginTop:-_h+'px'},600,function(){//通过取负margin值,隐藏第一行
-					_field.css('marginTop',0).appendTo(_wrap);//隐藏后,将该行的margin值置零,并插入到最后,实现无缝滚动
-				});
-			},_interval);//滚动间隔时间取决于_interval
-		}).trigger('mouseleave');//函数载入时,模拟执行mouseleave,即自动滚动
-	},
-	
-	/**
-	* 带箭头的图标滚动
-	* @member zUI.app
-	*/
-	pictureScroll: function(options){
-		
-	},
-	
-	/**
-	* 带箭头的图标滚动
-	* @member zUI.app
-	*/
-	slidesUp: function(options){
-		
-	},
-	
-	/**
-	* 懒加载
-	* @member zUI.app
-	* @example 
-		zUI.app.lazyload({
-			defObj:'.home_main',
-			defHeight:50
-		});
-		dom: <img alt="" src2="http://p.www.xiaomi.com/images/xmFocus/tee01.jpg" style="margin: 0px" />
-	*/	
-	lazyload: function(e){
-		var d = {
-				defObj : null,
-				defHeight : 0
-			};
-		d = $.extend(d, e || {});
-		var c = d.defHeight,
-			ipad = zUI.base.browser.ipad;
-		h = (typeof d.defObj === "object") ? d.defObj.find("img") : $(d.defObj).find("img");
-		var b = function(){
-			var i = document,
-			j = ipad ? window.pageYOffset : Math.max(i.documentElement.scrollTop, i.body.scrollTop);
-			if( ipad ){
-				d.defHeight = 0;
-			}
-			return i.documentElement.clientHeight + j - d.defHeight;
-		};
-		var f = function(j){
-			var i = j.attr("src2");
-			if(i){
-				j.css({
-					opacity : "0.3"
-				}).attr("src", i).removeAttr("src2").animate({
-					opacity : "1"
-				});
-			}
-		};
-		var g = function(){
-			h.each(function () {
-				if( ipad ) {
-					f($(this));
-				} else {
-					if ($(this).offset().top <= b()) {
-						f($(this));
-					}
-				}
+zUI.app = {};
+
+
+/**
+ * 向上切换
+ * @constructor zUI.app.marqueeUp
+ * @extends zUI.app
+ * @requires zUI.base
+ * @example 
+	zUI.app.marqueeUp('#index-shortcutBox');
+	dom: 
+		<div id="index-shortcutBox">
+			<ul class="fn-clear">
+				<li><a href="/portal/service/advisory.jsp" class="index-shortcutBox-item index-shortcutBox-item1">融资咨询</a></li>
+				<li><a href="/portal/service/displayService.jsp" class="index-shortcutBox-item index-shortcutBox-item2">展览服务</a></li>
+			</ul>
+			<ul class="fn-clear">
+				<li><a href="/portal/service/managementService.jsp" class="index-shortcutBox-item index-shortcutBox-item9">管理咨询</a></li>
+			</ul>
+		</div>
+*/
+zUI.app.marqueeUp = function(obj){
+	//多行应用@Mr.Think
+	var _wrap = $(obj);//定义滚动区域
+	var _interval=3000;//定义滚动间隙时间
+	var _moving;//需要清除的动画
+	_wrap.hover(function(){
+		clearInterval(_moving);//当鼠标在滚动区域中时,停止滚动
+	},function(){
+		_moving=setInterval(function(){
+			var _field=_wrap.find('ul:first');//此变量不可放置于函数起始处,li:first取值是变化的
+			var _h=_field.height();//取得每次滚动高度
+			_field.animate({marginTop:-_h+'px'},600,function(){//通过取负margin值,隐藏第一行
+				_field.css('marginTop',0).appendTo(_wrap);//隐藏后,将该行的margin值置零,并插入到最后,实现无缝滚动
 			});
+		},_interval);//滚动间隔时间取决于_interval
+	}).trigger('mouseleave');//函数载入时,模拟执行mouseleave,即自动滚动
+}
+
+/**
+ * 带箭头的图标滚动
+ * @constructor zUI.app.pictureScroll
+ * @extends zUI.app
+ * @requires zUI.base
+ */
+zUI.app.pictureScroll = function(options){
+	
+}
+
+/**
+ * 带箭头的图标滚动
+ * @constructor zUI.app.slidesUp
+ * @extends zUI.app
+ * @requires zUI.base
+ */
+zUI.app.slidesUp = function(options){
+	
+}
+
+/**
+ * 懒加载
+ * @constructor zUI.app.lazyload
+ * @extends zUI.app
+ * @requires zUI.base
+ * @example 
+	zUI.app.lazyload({
+		defObj:'.home_main',
+		defHeight:50
+	});
+	dom: <img alt="" src2="http://p.www.xiaomi.com/images/xmFocus/tee01.jpg" style="margin: 0px" />
+ */	
+zUI.app.lazyload = function(e){
+	var d = {
+			defObj : null,
+			defHeight : 0
 		};
-		g();
-		$(window).bind("scroll", function () {
-			g();
+	d = $.extend(d, e || {});
+	var c = d.defHeight,
+		ipad = zUI.base.browser.ipad;
+	h = (typeof d.defObj === "object") ? d.defObj.find("img") : $(d.defObj).find("img");
+	var b = function(){
+		var i = document,
+		j = ipad ? window.pageYOffset : Math.max(i.documentElement.scrollTop, i.body.scrollTop);
+		if( ipad ){
+			d.defHeight = 0;
+		}
+		return i.documentElement.clientHeight + j - d.defHeight;
+	};
+	var f = function(j){
+		var i = j.attr("src2");
+		if(i){
+			j.css({
+				opacity : "0.3"
+			}).attr("src", i).removeAttr("src2").animate({
+				opacity : "1"
+			});
+		}
+	};
+	var g = function(){
+		h.each(function () {
+			if( ipad ) {
+				f($(this));
+			} else {
+				if ($(this).offset().top <= b()) {
+					f($(this));
+				}
+			}
 		});
-	}
-};
+	};
+	g();
+	$(window).bind("scroll", function () {
+		g();
+	});
+}
 
 /**
  * grid插件
@@ -1447,7 +1544,6 @@ zUI.ui.BaseGrid = function(){
 		_core   = {
 			/**
 			* 内部表格表头内容
-			* @method tHeadFn
 			* @param {object} init 和 reflash共享的对象
 			*/
 			tHeadFn: function(options){
@@ -1476,7 +1572,6 @@ zUI.ui.BaseGrid = function(){
 			},
 			/**
 			* 内部表格主体内容
-			* @method tBodyFn
 			* @param {object} init 和 reflash共享的对象
 			*/
 			tBodyFn: function(options){
@@ -1524,7 +1619,6 @@ zUI.ui.BaseGrid = function(){
 			
 			/**
 			* 内部分页函数
-			* @method pagerFn
 			* @param {object} init 和 reflash共享的对象
 			*/
 			pagerFn: function(options){
@@ -1642,7 +1736,8 @@ zUI.ui.BaseGrid = function(){
 				_setMemory();
 				
 				/*分页事件*/
-				pager.find('.l-grid-footer-pager-btn a').die().live('click',function(){
+				pager.find('.l-grid-footer-pager-btn a').live('click',function(){
+				
 					var gridpageMsg = pager.find('.l-grid-footer-pager-msg'),
 						gridpageBtn = pager.find('.l-grid-footer-pager-btn'),
 						index       = Number( $(this).attr('page') ); // attr返回 string
@@ -1679,7 +1774,6 @@ zUI.ui.BaseGrid = function(){
 			
 			/**
 			* 内部获取行数据
-			* @method getRowData
 			* @param {Object} init 和 reflash共享的对象
 			* @param {Number} 记录的索引值
 			*/
@@ -1695,7 +1789,6 @@ zUI.ui.BaseGrid = function(){
 			
 			/**
 			* 初始化选择框
-			* @method initCheckbox
 			* @param {object} init 和 reflash共享的对象
 			*/
 			initCheckbox: function(options, selectedRecords){
@@ -1725,7 +1818,6 @@ zUI.ui.BaseGrid = function(){
 			
 			/**
 			* 选择框事件
-			* @method checkboxFn
 			* @param {object} init 和 reflash共享的对象
 			*/
 			checkboxFn: function(options){
@@ -1809,7 +1901,6 @@ zUI.ui.BaseGrid = function(){
 			
 			/**
 			* 明细按钮事件
-			* @method detailBtnFn
 			* @param {object} init 和 reflash共享的对象
 			*/
 			detailBtnFn: function(options){
@@ -1831,7 +1922,7 @@ zUI.ui.BaseGrid = function(){
 						next.hide();
 					}
 				});
-			}
+			}// _core.detailBtnFn end
 		}
 	
 	/**
@@ -2021,6 +2112,7 @@ zUI.ui.BaseGrid = function(){
 	};
 		
 	/**
+	* 获取选中的数据，并组装成表格可用的数据格式
 	* @member zUI.ui.BaseGrid
 	* @return {Object} 返回一个表格数据源
 	*/
@@ -2049,5 +2141,65 @@ zUI.ui.BaseGrid = function(){
 	};
 	
 }
-zUI.ui.BaseGrid = new zUI.ui.BaseGrid();
-zUI.ui.grid = zUI.ui.BaseGrid.init;
+
+/**
+ * grid实例
+ * @dest 封装在zUI.ui.grid里，可创建多个zUI.ui.grid，又避免多个表格this互相影响
+ */
+zUI.ui.grid = function(options){
+	var grid = new zUI.ui.BaseGrid();
+	grid.init(options);
+	return grid;
+}
+//zUI.ui.BaseGrid = new zUI.ui.BaseGrid();
+//zUI.ui.grid = zUI.ui.BaseGrid.init;
+
+
+/* var test = function(o){
+	var self = this;
+	self.o = o;
+}
+test.prototype.init = function(arg){
+	var s = {
+		name: 'null'
+	}
+	this.arg = arg;
+}
+test.prototype.reflash = function(){
+	console.log(this.arg.name)
+}
+
+var fn = function(options){
+	var run = new test();
+	run.init(options);
+	return run;
+}
+
+var a = fn({
+	name:'norion'
+});
+
+var b = fn({
+	name:'norion2'
+});
+
+b.reflash();
+a.reflash(); */
+
+/* function test(name,arg){
+	this.name = name;
+	this.arg = arg;
+}
+function testApply(name,arg,ground){
+	test.call(this, name, arg);
+	this.ground = ground;
+	alert(this.name+':'+this.arg+':'+this.ground);
+}
+var testA = new testApply('ss',21,'二'); 
+
+var test = {
+	saytest: function(name){
+		alert(name)
+	}
+}
+test.saytest.call(this, 'norion')*/
