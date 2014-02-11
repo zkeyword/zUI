@@ -1,0 +1,378 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>JavaScript实现的可以拖动排版可以关闭的DIV层丨芯晴网页特效丨CsrCode.Cn</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <style type="text/css">
+        body
+        {
+            margin: 0px;
+            padding: 0px;
+            font-size: 12px;
+            text-align: center;
+        }
+        body > div
+        {
+            text-align: center;
+            margin-right: auto;
+            margin-left: auto;
+        }
+        .content
+        {
+            width: 900px;
+        }
+        .content .left
+        {
+            float: left;
+            width: 20%;
+            border: 1px solid #0066CC;
+            margin: 3px;
+        }
+        .content .center
+        {
+            float: left;
+            border:1px solid red;
+            margin: 3px;
+            width: 57%;
+        }
+        .content .right
+        {
+            float: right;
+            width: 20%;
+            border: 1px solid #FF0000;
+            margin: 3px;
+        }
+        .mo
+        {
+            height: auto;
+            border: 1px solid #CCC;
+            margin: 3px;
+            background: #FFF;
+        }
+        .mo h1
+        {
+            background: #ECF9FF;
+            height: 18px;
+            padding: 3px;
+            cursor: move;
+        }
+        .closediv
+        {
+            cursor: default;
+        }
+        .minusspan
+        {
+            cursor: default;
+        }
+        .mo .nr
+        {
+            height: 80px;
+            border: 1px solid #F3F3F3;
+            margin: 2px;
+        }
+        h1
+        {
+            margin: 0px;
+            padding: 0px;
+            text-align: left;
+            font-size: 12px;
+        }
+        .dragging
+        {
+            filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+            opacity: 0.6;
+            moz-opacity: 0.6;
+        }
+    </style>
+    <script type="text/javascript">
+        flag = true;
+        var dragobj = {}
+        //window.onerror=function(){return false}
+        var domid = 12
+        function on_ini() {
+            String.prototype.inc = function (s) { return this.indexOf(s) > -1 ? true : false }
+            var agent = navigator.userAgent
+            window.isOpr = agent.inc("Opera")
+            window.isIE = agent.inc("IE") && !isOpr
+            window.isMoz = agent.inc("Mozilla") && !isOpr && !isIE
+            if (isMoz) {
+                Event.prototype.__defineGetter__("x", function () { return this.clientX + 2 })
+                Event.prototype.__defineGetter__("y", function () { return this.clientY + 2 })
+            }
+            basic_ini()
+        }
+        function basic_ini() {
+            window.$ = function (obj) { return typeof (obj) == "string" ? document.getElementById(obj) : obj }
+            window.oDel = function (obj) { if ($(obj) != null) { $(obj).parentNode.removeChild($(obj)) } }
+        }
+        window.oDel = function (obj) { if ($(obj) != null) { $(obj).parentNode.removeChild($(obj)) } }
+        window.onload = function () {
+            on_ini()
+            var o = document.getElementsByTagName("h1")
+            for (var i = 0; i < o.length; i++) {
+                o[i].onmousedown = addevent;
+                //添加折叠和关闭按钮
+                var tt = document.createElement("div");
+                tt.style.cssText = "float:left";
+                var span = document.createElement("span");
+                span.innerHTML = "--" + o[i].innerHTML;
+                span.style.cssText = "cursor:default;";
+                span.onmousedown = minusDiv;
+                tt.appendChild(span);
+                var close = document.createElement("div");
+                close.innerHTML = "×";
+                close.style.cssText = "cursor:default;float:right";
+                close.onmousedown = closeDiv;
+                o[i].innerHTML = "";
+                o[i].appendChild(tt);
+                o[i].appendChild(close);
+            }
+            var dom1 = document.getElementById("dom1")
+            dom1.onmouseup = function () {
+                if (dragobj.o != null) {
+                    dragobj.o.style.width = "auto"
+                    dragobj.o.style.height = "auto"
+                    dragobj.otemp.parentNode.insertBefore(dragobj.o, dragobj.otemp)
+                    dragobj.o.style.position = ""
+                    oDel(dragobj.otemp)
+                    dragobj = {}
+                }
+            }
+            dom1.onmousemove = function (mouseEvent) {
+                mouseEvent = mouseEvent || event;
+                //alert(mouseEvent)
+                if (dragobj.o != null) {
+                    //横向滚动
+                    //dragobj.o.style.left=(e.x-dragobj.xx[0])+"px"  
+                    //竖向滚动
+                    dragobj.o.style.top = (mouseEvent.y - dragobj.xx[1]) - dom1.offsetTop - GetPX(getCurrentStyle(dom1, "marginTop")) + "px";
+                    createtmpl(mouseEvent, dragobj.o)    //传递当前拖动对象
+                }
+            }
+            //            dom1.onfocus = function () { dom1.onmouseup() }
+            //            dom1.onblur = function () { dom1.onmouseup() }
+            var i = 0;
+            if (isIE) {
+                dom1.onmouseleave = function () {
+                    document.getElementById("stats").value = ++i;                  
+                    //dom1.onmouseup();
+                }
+            } else {
+                dom1.onmouseout = function (mouseEvent) {
+                    mouseEvent = mouseEvent || event;
+                    var obj = mouseEvent.target || mouseEvent.srcElement;
+                    var a = mouseEvent.currentTarget, b = mouseEvent.relatedTarget;
+                    if (!elContains(a, b) && a != b) {
+                        //dom1.onmouseup();
+                    }
+                };
+            }
+        };
+        //折叠或者显示层
+        function minusDiv(e) {
+            e = e || event
+            var nr = this.parentNode.parentNode.nextSibling;    //取得内容层
+            nr.style.display = nr.style.display == "" ? "none" : "";
+        }
+        //移出层
+        function closeDiv(e) {
+            e = e || event
+            var mdiv = this.parentNode.parentNode;    //取得目标层
+            oDel(mdiv);
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            } else {
+                e.cancelBubble = true;
+            }
+        }
+        function addevent(e) {
+            if (dragobj.o != null)
+                return false
+            e = e || event
+            dragobj.o = this.parentNode
+            var height = isIE ? dragobj.o.offsetHeight : getCurrentStyle(dragobj.o, "height");
+            var width = isIE ? dragobj.o.offsetWidth : getCurrentStyle(dragobj.o, "width");
+			if(isOpr)
+			{
+				height = dragobj.o.clientHeight;
+				width = dragobj.o.clientWidth;
+			}
+            dragobj.xy = getxy(dragobj.o)
+            dragobj.xx = new Array((e.x - dragobj.xy[1]), (e.y - dragobj.xy[0]))
+            dragobj.o.style.width = width;
+            dragobj.o.style.height = height;
+            
+            //dragobj.o.style.left="auto";
+            if (isIE) {
+                dragobj.o.style.left = "0px";
+            }
+            dragobj.o.style.top = GetPX(dragobj.o.offsetTop) - GetPX(getCurrentStyle(dragobj.o, "marginTop")) + "px"; //(e.y-dragobj.xx[1])+"px"    
+			if(isOpr)
+			{
+				 //-1其实是减去父div的border-top
+				 dragobj.o.style.top = GetPX(dragobj.o.offsetTop)- 				GetPX(getCurrentStyle("dom1","borderTopWidth")) - GetPX(getCurrentStyle(dragobj.o, "marginTop")) + "px";
+				 document.getElementById("txtPre").value = dragobj.o.style.top
+			}
+            dragobj.o.style.position = "absolute"
+            dragobj.o.style.filter = 'alpha(opacity=60)';        //添加拖动透明效果
+            var om = document.createElement("div")
+            dragobj.otemp = om;
+            om.className = "mo";
+            om.style.width = width;
+            om.style.height = height;
+            om.style.border = "1px dashed red";    //ikaiser添加，实现虚线框
+            om.style.visibility = "hidden";           
+            if (dragobj.o.parentNode) {
+                dragobj.o.parentNode.insertBefore(om, dragobj.o)
+            }
+            return false
+        }
+        document.onselectstart = function () { return false }
+        function getxy(e) {
+            var a = new Array()
+            var t = e.offsetTop;
+            var l = e.offsetLeft;
+            var w = e.offsetWidth;
+            var h = e.offsetHeight;
+            while (e = e.offsetParent) {
+                t += e.offsetTop;
+                l += e.offsetLeft;
+            }
+            a[0] = t; a[1] = l; a[2] = w; a[3] = h
+            return a;
+        }
+        function inner(o, e) {
+            var a = getxy(o)
+            if (o.id == "m5") {
+                document.getElementById("txtPre").value = e.x + ">" + a[1] + "&&" + e.x + "< " + (a[1] + "+" + a[2]);
+                document.getElementById("stats").value = e.y + "," + a[0] + "+" + a[3] + "/2=" + (a[0] + a[3] / 2);
+            }
+            if (((isIE || isOpr) && e.y > a[0] && e.y < (a[0] + a[3])) || (e.x > a[1] && e.x < (a[1] + a[2]) && e.y > a[0] && e.y < (a[0] + a[3]))) {
+                if (e.y < (a[0] + a[3] / 2)) {
+                    return 1;
+                }
+                else {
+                    return 2;
+                }
+            } else
+                return 0;
+        }
+        //将当前拖动层在拖动时可变化大小，预览效果
+        function createtmpl(e, elm) {
+            for (var i = 4; i < domid; i++) {
+                if (document.getElementById("m" + i) == null)    //已经移出的层不再遍历
+                    continue;
+                if ($("m" + i) == dragobj.o)
+                    continue
+                var b = inner($("m" + i), e)
+                if (b == 0)
+                    continue
+                dragobj.otemp.style.width = $("m" + i).offsetWidth
+                elm.style.width = $("m" + i).offsetWidth;
+                //1为上移，2为下移
+                if (b == 1) {    
+                    $("m" + i).parentNode.insertBefore(dragobj.otemp, $("m" + i))
+                } else {
+                   
+                    if ($("m" + i).nextSibling == null) {
+                        $("m" + i).parentNode.appendChild(dragobj.otemp)
+                    } else {
+                        $("m" + i).parentNode.insertBefore(dragobj.otemp, $("m" + i).nextSibling)
+                    }
+                }
+                return
+            }
+        }
+        function getCurrentStyle(ele, name) {
+            if (typeof (ele) == "string") {
+                ele = document.getElementById(ele);
+            }
+            if (ele.currentStyle) {
+                return ele.currentStyle[name];
+            }
+            if (document.defaultView && document.defaultView.getComputedStyle) {
+                return document.defaultView.getComputedStyle(ele, null)[name];
+            }
+        }
+        function GetPX(px) {
+            px = parseInt(px.toString().replace(/px/i, ""));
+			if(isNaN(px))
+			{
+				return 0;
+			}
+            return px;
+        }
+        function elContains(a, b) {
+            try {
+                return a.contains ? a != b && a.contains(b) : !!(a.compareDocumentPosition(b) & 16);
+            } catch (e) { }
+        }   
+    </script>
+</head>
+<body>
+    <div>
+        <input type="text" id="txtPre" />
+        <input type="text" id="stats" /></div>
+    <div class="content">
+        <div class="left" id="dom0">
+            <div class="mo" id="m0">
+                <h1>
+                    dom0</h1>
+                <div class="nr">
+                </div>
+            </div>
+            <div class="mo" id="m1">
+                <h1>
+                    dom1</h1>
+                <div class="nr">
+                </div>
+            </div>
+            <div class="mo" id="m2">
+                <h1>
+                    dom2</h1>
+                <div class="nr">
+                </div>
+            </div>
+            <div class="mo" id="m3">
+                <h1>
+                    dom3</h1>
+                <div class="nr">
+                </div>
+            </div>
+        </div>
+        <div class="center" id="dom1" style="position: relative;">
+            <div class="mo" id="m4" >
+                <h1>
+                    dom4</h1>
+                <div class="nr">
+                    <p align="center">
+                        本特效由 <a href="http://www.CsrCode.cn">芯晴网页特效</a>丨CsrCode.Cn 收集于互联网，只为兴趣与学习交流，不作商业用途。</p>
+                </div>
+            </div>
+            <div class="mo" id="m5">
+                <h1>
+                    dom5</h1>
+                <div class="nr">
+                </div>
+            </div>
+            <div class="mo" id="m6">
+                <h1>
+                    dom6</h1>
+                <div class="nr">
+                </div>
+            </div>
+            <div class="mo" id="m7">
+                <h1>
+                    dom7</h1>
+                <div class="nr">
+                </div>
+            </div>
+            <div class="mo" id="m8">
+                <h1>
+                    dom8</h1>
+                <div class="nr">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

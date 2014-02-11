@@ -1,0 +1,34 @@
+@charset "utf-8";
+/**
+* @Author:      norion
+* @Update:      2014.01.09
+* @Update by:   norion
+* @overview:    编辑器组件
+*/
+
+.l-ui-editorWrap{border:1px solid #ddd;border-radius:5px;background:#fff;overflow:hidden;}
+.l-ui-editorWrap-full{position:absolute;top:0;left:0;border:0 none;z-index:999999;width:100%;height:100%;}
+	.l-ui-editor-tool{height:24px;background:#eee;border-bottom:1px solid #d1d1d1;padding:4px}
+		.l-ui-editor-tool a{display:block;width:24px;height:22px;float:left;border:1px solid #eee}
+		.l-ui-editor-tool a:hover{background:#eee;border:1px solid #BBB;border-radius:2px}
+			.l-ui-editor-toolIco{display:block;width:20px;height:20px;margin:1px 2px;background:url(../images/l-ui-editor.png) no-repeat;}
+			.l-ui-editor-toolIco-bold{background-position:0 -20px}
+			.l-ui-editor-toolIco-italic{background-position:-20px -20px}
+			.l-ui-editor-toolIco-strikethrough{background-position:-540px -20px}
+			/* .l-ui-editor-toolIco-underline{background-position:-40px 0} */
+			.l-ui-editor-toolIco-insertOrderedList{background-position:-60px -20px}
+			.l-ui-editor-toolIco-insertUnorderedList{background-position:-40px -20px}
+			.l-ui-editor-toolIco-justifyleft{background-position:-100px -20px}
+			.l-ui-editor-toolIco-justifycenter{background-position:-120px -20px}
+			.l-ui-editor-toolIco-justifyright{background-position:-140px -20px}
+			/* .l-ui-editor-toolIco-justifyfull{background-position:-140px 0} */
+			.l-ui-editor-toolIco-createlink{background-position:-160px -20px}
+			.l-ui-editor-toolIco-unlink{background-position:-180px -20px}
+			.l-ui-editor-toolIco-fullscreen{background-position:-240px -20px}
+			.l-ui-editor-toolIco-source{background-position:-560px -20px}
+			.l-ui-editor-toolIco-insertImage{background-position:-580px -20px}
+			/* .l-ui-editor-toolIco-fontname{background-position:-160px -20px}
+			.l-ui-editor-toolIco-fontsize{background-position:-180px -20px}
+			.l-ui-editor-toolIco-forecolor{background-position:-200px -20px}
+			.l-ui-editor-toolIco-backcolor{background-position:-220px -20px} */
+		

@@ -11,35 +11,27 @@
 <body>
 	<div id="wrap">
 		<section>
-			<header>弹出框</header>
+			<header>tip：title模拟控件</header>
 			<article>
-				<p><a href="#" id="pop">点击打开</a></p>
-				<p>
-					<pre>
-						$('#pop').click(function(){
-							zUI.ui.pop.open({
-								title:'标题',
-								html:'111111'
-							});
-						});
-					</pre>
-				</p>
+				<div class="ui-wrap fn-clear">
+					<a id="tip" href="#" title="title模拟控件">title模拟控件</a>
+				</div>
+				<pre>
+					zUI.ui.tip({
+						tipItem:'#tip'
+						isArrow: true
+					});
+				</pre>
 			</article>
 		</section>
 	</div>
 </body>
 <script type="text/javascript">
 $(function(){
-	/*POP*/
-	$('#pop').click(function(){
-		zUI.ui.pop.open({
-			title:'标题',
-			html:'111111',
-			onloadFn:function(id){
-				alert('弹出框的id：'+id)
-			}
-		});
-		return false;
+	/*tip控件*/
+	zUI.ui.tip({
+		tipItem:'#tip',
+		isArrow: true
 	});
 });
 </script>

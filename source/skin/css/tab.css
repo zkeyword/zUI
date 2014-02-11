@@ -1,0 +1,10 @@
+/**
+* @Author:      norion.z
+* @Update:      2013.12.23
+* @Update by:   norion
+* @overview:    zUI
+*/
+
+#tab li{float:left;padding:5px 20px;cursor:pointer;border:1px solid #ddd;}
+	#tab li.on{background:#ddd;}
+.tab-main{padding:10px;background:#ddd;border:1px solid #ddd;}

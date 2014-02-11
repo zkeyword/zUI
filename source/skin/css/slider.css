@@ -1,0 +1,15 @@
+@charset "utf-8";
+/**
+* @Author:      norion
+* @Update:      2013.12.25
+* @Update by:   norion
+* @overview:    tip提示控件
+*/
+
+.l-sliderWrap{background:#c6c6c6;position:relative;overflow:hidden;}
+	.l-sliderWrap-x{width:200px;height:18px;}
+	.l-sliderWrap-y{width:18px;height:200px;}
+	.l-sliderWrap .l-sliderBtn{width:18px;height:18px;position:absolute;z-index:2;overflow:hidden;background:#1a1a1a;cursor:pointer;outline:none;}
+		.l-sliderWrap:hover .l-sliderBtn{background:#333;}
+	.l-sliderWrap .l-sliderComplete{position:absolute;z-index:1;background:#2d89ef;}
+		.l-sliderWrap:hover .l-sliderComplete{background:#439bfd;}

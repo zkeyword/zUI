@@ -1,0 +1,12 @@
+@charset "utf-8";
+/**
+* @Author:      norion
+* @Update:      2013.12.30
+* @Update by:   norion
+* @overview:    sortable 拖动排序
+*/
+
+.l-sortableWrap{width:200px;position:relative;overflow:hidden;border:1px solid #c6c6c6;padding:0 10px 10px}
+	.l-sortableItem{width:200px;height:28px;line-height:28px;background:#f1f1f1;border:1px solid #c6c6c6;text-align:center;margin:10px 0 0}
+	#l-sortable-proxy{cursor:move;border:1px dotted #999;position:absolute;}
+	

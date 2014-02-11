@@ -78,7 +78,7 @@ zUI.base = {
 	 * @param {Object} 需要打印的对象
 	 */
 	log: function(msg){
-		if (window["console"]){
+		if( window["console"] ){
 			console.log(msg);
 		}
 	},
@@ -131,7 +131,7 @@ zUI.base.browser = (function(){
 			browser[bLower] = c; 
 		}
 	});
-	if (browser.msie) {
+	if( browser.msie ){
 		browser.ie = browser.msie;
 		var v = parseInt(browser.msie, 10);
 		browser['ie' + v] = true;
@@ -141,7 +141,7 @@ zUI.base.browser = (function(){
 
 /*解决ie6下的背景图片缓存问题  */
 if( zUI.base.browser.ie6 ) {
-	try {
+	try{
 		document.execCommand('BackgroundImageCache', false, true);
 	} catch (e) {}
 }
@@ -164,8 +164,8 @@ zUI.base.cookie = {
 	 * @param {String} cookie的有效期
 	 * @return {Boolean}
 	 */
-    set: function (name, value, domain, path, hour) {
-		if (hour) {
+    set: function(name, value, domain, path, hour){
+		if( hour ){
 			var today  = new Date(),
 				expire = new Date();
 			expire.setTime(today.getTime() + 36E5 * hour);
@@ -179,7 +179,7 @@ zUI.base.cookie = {
 	 * @param {String} cookie的名称
 	 * @return {String} cookie的值
 	 */
-	get: function (name) {
+	get: function( name ){
 		var r = new RegExp("(?:^|;+|\\s+)" + name + "=([^;]*)"),
 			m = document.cookie.match(r);
 		return unescape(decodeURI(!m ? "" : m[1]));
@@ -191,7 +191,7 @@ zUI.base.cookie = {
 	 * @param {String} cookie的域名
 	 * @param {String} cookie存放的路径
 	 */
-	del: function (name, domain, path) {
+	del: function(name, domain, path){
 		document.cookie = name + "=; expires=Mon, 26 Jul 1997 05:00:00 GMT; " + (path ? "path=" + path + "; " : "path=/; ") + (domain ? "domain=" + domain + ";" : "");
 	}
 };
@@ -257,16 +257,16 @@ zUI.ui = {
 	
 	/**
 	 * 获取鼠标位置
-	 * @param {Object} 事件
+	 * @param {Object} event事件
 	 * @return {Array} 返回鼠标的x、y轴：[positionX, positionY]
 	 */
-	mousePosition: function(b) {
-		var b = b || window.event,
-			d = b.pageX || b.clientX + document.body.scrollLeft,
-			c = b.pageY || b.clientY + document.body.scrollTop;
-		return {
-			positionX : d,
-			positionY : c
+	mousePosition: function(e){
+		var e = e || window.event,
+			x = e.pageX || e.clientX + document.body.scrollLeft,
+			y = e.pageY || e.clientY + document.body.scrollTop;
+		return{
+			positionX : x,
+			positionY : y
 		};
 	},
 	
@@ -282,7 +282,7 @@ zUI.ui = {
 
 /**
  * 拖动插件 
- * @constructor zUI.ui.tab
+ * @constructor zUI.ui.drag
  * @extends zUI.ui
  * @requires zUI.base
  * @author norion
@@ -293,7 +293,7 @@ zUI.ui = {
 	   dragWrap:'#dragWrap'
    });
  */
-zUI.ui.drag = function(options){
+zUI.ui.drag = function(options){         //IE下 iframe内的的拖动还是有问题
 
 	var o = options || {};
 	if( !o.dragItem ) return false;
@@ -302,19 +302,24 @@ zUI.ui.drag = function(options){
 		win      = parent.document || document,
 		mouse    = {x:0,y:0};
 		
-	function _moveDialog(event){
-        var e    = window.event || event,
-        	top  = parseInt(dragWrap.css('top')) + (e.clientY - mouse.y),
-        	left = parseInt(dragWrap.css('left')) + (e.clientX - mouse.x);
-        dragWrap.css({top:top,left:left});
+	function _moveDialog(e){
+        var e    = window.event || e,
+			top  = dragWrap.css('top') == 'auto' ? 0 : dragWrap.css('top'),
+			left = dragWrap.css('left') == 'auto' ? 0 : dragWrap.css('left');
+			
+        dragWrap.css({
+			top  : parseInt(top) + (e.clientY - mouse.y),
+			left : parseInt(left) + (e.clientX - mouse.x)
+		});
         mouse.x = e.clientX;
         mouse.y = e.clientY;
     };
-    dragItem.mousedown(function(event){
-        var e = window.event || event;
+    dragItem.mousedown(function(e){
+        var e = window.event || e;
         mouse.x = e.clientX;
         mouse.y = e.clientY;
         $(win).bind('mousemove', _moveDialog);
+		e.preventDefault(); //阻止默认动作
     });
     $(win).mouseup(function(event){
         $(win).unbind('mousemove', _moveDialog);
@@ -420,7 +425,7 @@ zUI.ui.tab = function(options){
  * title属性模拟插件
  * @constructor zUI.ui.tip
  * @extends zUI.ui
- * @requires zUI.base
+ * @requires zUI.base zUI.ui.wrap() zUI.ui.zIndex() zUI.ui.mousePosition()
  * @author norion
  * @blog http://zkeyword.com/
  */
@@ -587,7 +592,7 @@ zUI.ui.tip = function(options){
  * 弹出框插件
  * @constructor zUI.ui.pop
  * @extends zUI.ui
- * @requires zUI.base
+ * @requires zUI.base zUI.borwser zUI.ui.wrap() zUI.ui.zIndex() zUI.ui.lock() zUI.ui.unlock() zUI.ui.drag()
  * @author norion
  * @blog http://zkeyword.com/
  * @example 
@@ -618,6 +623,7 @@ zUI.ui.pop = {
 			ajax          = o.ajax || '',                                      //用ajax方式加载
 			html          = o.html || '',                                      //用html方式加载
 			onloadFn      = o.onloadFn,                                        //载入时要触发的事件
+			closeFn       = o.closeFn,                                         //关闭时要触发的事件
 			btns          = o.btns || '',                                      //弹出框的按钮集合
 			isMask        = o.isMask === undefined  || o.isMask,               //是否允许遮罩,默认true
 			isMaskClose   = o.isMaskClose === undefined || o.isMaskClose,      //是否点击遮罩关闭,默认true
@@ -661,9 +667,10 @@ zUI.ui.pop = {
 			    				 .find('.ui-floatCenter'),
 			    btnMain = btnWrap.find('.ui-sl-floatCenter');			
 			$.each(btns,function(i,item){
-				btnMain.append('<a href="javascript:void(0);" class="'+ (item.cls?'ui-btn ui-btnMain ui-floatCenter-item '+item.cls:'ui-btn ui-btnMain ui-floatCenter-item') +'"><span>'+item.text+'</span></a>');
+				btnMain.append('<a href="javascript:;" class="'+ (item.cls?'ui-btn ui-btnMain ui-floatCenter-item '+item.cls:'ui-btn ui-btnMain ui-floatCenter-item') +'"><span>'+item.text+'</span></a>');
 				item.onclick && btnMain.find('a').eq(i).click(function(){
 					item.onclick(i,item,id);
+					zUI.ui.pop.close(id);
 				});
 			});		
 			var popBtnsHeight = btnWrap.height();
@@ -676,9 +683,9 @@ zUI.ui.pop = {
 			popContent.append('<iframe src="'+ url +'" id="l-pop-iframe" frameborder="no" border="0" style="width:'+ width +'px;height:'+ popHeight +'px"></iframe>').addClass('l-pop-contentIframe');
 		}else if( ajax ){
 			$.ajax({
-				url: ajax,
-				cache: false,
-				success: function(data){
+				url     : ajax,
+				cache   : false,
+				success : function(data){
 					popContent.append(data);
 				}
 			}); 
@@ -686,22 +693,17 @@ zUI.ui.pop = {
 			popContent.append(html);
 		};
 		
-		/*载入时要触发的事件*/
-		if( zUI.base.isFunction(onloadFn) ){
-			onloadFn(id);
-		}
-		
-		//位置
+		/*位置*/
 		var win  = $(window),
 			top  = top || win.scrollTop() + win.height()/2 - popWrap.height()/2,
 			left = left || ( win.width() - popWrap.width() )/2;
-		popWrap.css({top:top,left:left});
+		popWrap.css({top:top, left:left});
 		
 		/*遮罩*/
 		if( isMask ){
 			zUI.ui.lock();
 		}
-		
+
 		/*拖拽*/
 		if( isDrag ){
 			zUI.ui.drag({
@@ -710,37 +712,63 @@ zUI.ui.pop = {
 			});
 		}
 		
-		/*点击遮罩关闭*/
-		if( isMask && isMaskClose ){
-			$('.l-ui-lock').click(function(){
-				zUI.ui.pop.close(id);
-			});
+		/*载入时要触发的事件*/
+		if( zUI.base.isFunction(onloadFn) ){
+			onloadFn(id);
 		}
 		
 		/*关闭*/
 		if( allowClose ){
+		
+			/*添加关闭按钮*/
 			popMain.prepend('<div class="l-pop-close">x</div>');
 			$('.l-pop-close').click(function(){
+			
+				/*关闭时要触发的事件*/
+				if( zUI.base.isFunction(closeFn) ){
+					closeFn(id);
+				}
+				
 				zUI.ui.pop.close(id);
 			});
-		}
-		/*esc退出*/
-		if( allowEscClose ){
-			var _modalKey = function(e){
-				e = e || event;
-				var code = e.which || event.keyCode;
-				if(code == 27){
+			
+			/*点击遮罩关闭*/
+			if( isMask && isMaskClose ){
+				$('.l-ui-lock').click(function(){
+					
+					/*关闭时要触发的事件*/
+					if( zUI.base.isFunction(closeFn) ){
+						closeFn(id);
+					}
+					
 					zUI.ui.pop.close(id);
-				}
-			};
-			
-			if(document.attachEvent){
-				document.attachEvent('onkeydown', _modalKey);
-			}else{
-				document.addEventListener('keydown', _modalKey, true);
+				});
 			}
-			
-		}
+		
+			/*esc退出*/
+			if( allowEscClose ){
+				var _modalKey = function(e){
+					e = e || event;
+					var code = e.which || event.keyCode;
+					if(code == 27){
+					
+						/*关闭时要触发的事件*/
+						if( zUI.base.isFunction(closeFn) ){
+							closeFn(id);
+						}
+						
+						zUI.ui.pop.close(id);
+					}
+				};
+				
+				if(document.attachEvent){
+					document.attachEvent('onkeydown', _modalKey);
+				}else{
+					document.addEventListener('keydown', _modalKey, true);
+				}
+				
+			}
+		}//end if ( allowClose )
 	},
 	
 	/**
@@ -777,7 +805,7 @@ zUI.ui.pop = {
  * 对话框插件
  * @constructor zUI.ui.dialog
  * @extends zUI.ui
- * @requires zUI.base
+ * @requires zUI.base zUI.borwser zUI.ui.wrap() zUI.ui.zIndex() zUI.ui.lock() zUI.ui.unlock() zUI.ui.drag()
  * @author norion
  * @blog http://zkeyword.com/
  */
@@ -843,16 +871,16 @@ zUI.ui.dialog = {
 			btnWrapHeight = btnWrap.height();	
 		if( btns ){
 			$.each(btns,function(i,item){
-				btnMain.append('<a href="javascript:void(0);" class="'+ (item.cls?'ui-btn ui-btnMain ui-floatCenter-item '+item.cls:'ui-btn ui-btnMain ui-floatCenter-item') +'"><span>'+item.text+'</span></a>');
+				btnMain.append('<a href="javascript:;" class="'+ (item.cls?'ui-btn ui-btnMain ui-floatCenter-item '+item.cls:'ui-btn ui-btnMain ui-floatCenter-item') +'"><span>'+item.text+'</span></a>');
 				item.onclick && btnMain.find('a').eq(i).click(function(){
 					item.onclick(i,item);
 					zUI.ui.dialog.close(id);
 				});
 			});	
 		}else{
-			switch (type) {
+			switch( type ){
 				case 'alert':
-					btnMain.append('<a href="javascript:void(0);" class="ui-btn ui-btnMain ui-floatCenter-item l-dialog-ok"><span>确定</span></a>');
+					btnMain.append('<a href="javascript:;" class="ui-btn ui-btnMain ui-floatCenter-item l-dialog-ok"><span>确定</span></a>');
 					btnMain.find('.l-dialog-ok').click(function(){
 						if( zUI.base.isFunction(ok) ){
 							ok();
@@ -861,7 +889,7 @@ zUI.ui.dialog = {
 					});
 					break;
 				case 'confirm':
-					btnMain.append('<a href="javascript:void(0);" class="ui-btn ui-btnMain ui-floatCenter-item l-dialog-ok"><span>确定</span></a><a href="javascript:void(0);" class="ui-btn ui-btnMain ui-btnMain-cancel ui-floatCenter-item l-dialog-no"><span>取消</span></a>');
+					btnMain.append('<a href="javascript:;" class="ui-btn ui-btnMain ui-floatCenter-item l-dialog-ok"><span>确定</span></a><a href="javascript:;" class="ui-btn ui-btnMain ui-btnMain-cancel ui-floatCenter-item l-dialog-no"><span>取消</span></a>');
 					btnMain.find('.l-dialog-ok').click(function(){
 						if( zUI.base.isFunction(ok) ){
 							ok();
@@ -876,7 +904,7 @@ zUI.ui.dialog = {
 					});
 					break;
 				case 'error':
-					btnMain.append('<a href="javascript:void(0);" class="ui-btn ui-btnMain ui-btnMain-cancel ui-floatCenter-item l-dialog-no"><span>取消</span></a>');
+					btnMain.append('<a href="javascript:;" class="ui-btn ui-btnMain ui-btnMain-cancel ui-floatCenter-item l-dialog-no"><span>取消</span></a>');
 					btnMain.find('.l-dialog-no').click(function(){
 						if( zUI.base.isFunction(no) ){
 							no();
@@ -894,7 +922,7 @@ zUI.ui.dialog = {
 			left = left || ( win.width() - dialogWrap.width() )/2;
 		dialogWrap.css({top:top,left:left});
 		
-		zUI.base.log( dialogWrap.height() );
+		//zUI.base.log( dialogWrap.height() );
 		
 		/*遮罩*/
 		if( isMask ){
@@ -909,37 +937,39 @@ zUI.ui.dialog = {
 			});
 		}
 		
-		/*点击遮罩关闭*/
-		/* if( isMask && isMaskClose ){
-			$('.l-ui-lock').click(function(){
-				zUI.ui.dialog.close(id);
-			});
-		} */
-		
 		/*关闭*/
 		if( allowClose ){
+		
+			/*添加关闭按钮*/
 			var dialogClose = dialogMain.prepend('<div class="l-dialog-close">x</div>').find('.l-dialog-close');
 			dialogClose.click(function(){
 				zUI.ui.dialog.close(id);
 			});
-		}
-		
-		/*esc退出*/
-		if( allowEscClose ){
-			var _modalKey = function (e){
-				e = e || event;
-				var code = e.which || event.keyCode;
-				if(code === 27){
-					zUI.ui.dialog.close(id);
-				}
-			};
 			
-			if(document.attachEvent){
-				document.attachEvent('onkeydown', _modalKey);
-			}else{
-				document.addEventListener('keydown', _modalKey, true);
+			/*点击遮罩关闭*/
+			/* if( isMask && isMaskClose ){
+				$('.l-ui-lock').click(function(){
+					zUI.ui.dialog.close(id);
+				});
+			} */
+		
+			/*esc退出*/
+			if( allowEscClose ){
+				var _modalKey = function (e){
+					e = e || event;
+					var code = e.which || event.keyCode;
+					if(code === 27){
+						zUI.ui.dialog.close(id);
+					}
+				};
+				
+				if(document.attachEvent){
+					document.attachEvent('onkeydown', _modalKey);
+				}else{
+					document.addEventListener('keydown', _modalKey, true);
+				}
 			}
-		}
+		}// end if( allowClose )
 	},
 	
 	/**
@@ -1077,8 +1107,9 @@ zUI.ui.form = {
 	 * @update 2013.04.10
 	 * @param {object} options
 	 * @example 
-		$('#s').click(function(){
+		//$('#s').click(function(){
 			zUI.ui.form.upload({
+				trigger: '#s',
 				url:'<c:url value="/file/upload.cf"/>?width=200&height=200',
 				name:'imgFile',
 				onSend: function(){
@@ -1088,7 +1119,7 @@ zUI.ui.form = {
 					alert(data)
 				};
 			});
-		});
+		//});
 	 */
 	upload: function(options){
 		var o = options || {};
@@ -1144,9 +1175,56 @@ zUI.ui.form = {
 			fileInput.click();
 		});		
 	},
-	fill: function(options){
-		
+	
+	/**
+	 * @name input file兼容模拟
+	 * @author norion
+	 * @blog http://zkeyword.com/
+	 * @update 2013.12.24
+	 * @param {object} options
+	 * @example 
+		zUI.ui.form.file({
+			inputObj:'#uploadfile'
+		});
+	 */
+	file: function(options){
+		var o = options || {};
+		if( !o.inputObj ) return false;
+		var inputObj    = $(o.inputObj).addClass('.l-form-file'),    //input对象
+			cls         = o.cls || '',
+			inputParent = inputObj.wrap('<div class="l-form-fileWrap"></div>').parent()
+																			  .append('<input type="text" class="ui-input l-form-fileInput" /><a href="javascript:;" class="ui-btn ui-btnMain l-form-fileBtn"><span>浏览</span></a>'),
+			inputNewObj = inputParent.find('.l-form-fileInput').addClass(cls),
+			btnObj      = inputParent.find('.l-form-fileBtn');
+			
+		inputObj.css({
+			position : 'absolute',
+			zIndex   : '1',
+			top      : 0,
+			left     : 0,
+			width    : inputParent.width(),
+			height   : inputParent.height(),
+			opacity  : 0,
+			filter   : 'Alpha(opacity:0)',
+			cursor   : 'pointer',
+			dispaly  : 'block'
+		}).change(function () {
+			inputNewObj.val(inputObj.val());
+		});
+			
 	},
+	
+	/**
+	 * @name input select兼容模拟
+	 * @author norion
+	 * @blog http://zkeyword.com/
+	 * @update 
+	 * @param {object} options
+	 * @example 
+		zUI.ui.form.select({
+			inputObj:'#uploadfile'
+		});
+	 */
 	select: function(options){
 		
 	}
@@ -1157,7 +1235,7 @@ zUI.ui.form = {
  * placeholder兼容插件
  * @constructor zUI.ui.selectArea
  * @extends zUI.ui
- * @requires zUI.base
+ * @requires zUI.base zUI.base.browser.ie
  * @author norion
  * @blog http://zkeyword.com/
  * @example 
@@ -1198,7 +1276,7 @@ zUI.ui.placeholder = function(options){
  * 地区切换
  * @constructor zUI.ui.selectArea
  * @extends zUI.ui
- * @requires zUI.base
+ * @requires zUI.base zUI.ui.tab()
  * @author norion
  * @blog http://zkeyword.com/
  */
@@ -1391,11 +1469,11 @@ zUI.app = {};
 	dom: 
 		<div id="index-shortcutBox">
 			<ul class="fn-clear">
-				<li><a href="/portal/service/advisory.jsp" class="index-shortcutBox-item index-shortcutBox-item1">融资咨询</a></li>
-				<li><a href="/portal/service/displayService.jsp" class="index-shortcutBox-item index-shortcutBox-item2">展览服务</a></li>
+				<li><a href="#" class="index-shortcutBox-item index-shortcutBox-item1">zUI咨询</a></li>
+				<li><a href="#" class="index-shortcutBox-item index-shortcutBox-item2">zUI服务</a></li>
 			</ul>
 			<ul class="fn-clear">
-				<li><a href="/portal/service/managementService.jsp" class="index-shortcutBox-item index-shortcutBox-item9">管理咨询</a></li>
+				<li><a href="#" class="index-shortcutBox-item index-shortcutBox-item9">zUI管理咨询</a></li>
 			</ul>
 		</div>
 */
@@ -1415,27 +1493,1436 @@ zUI.app.marqueeUp = function(obj){
 			});
 		},_interval);//滚动间隔时间取决于_interval
 	}).trigger('mouseleave');//函数载入时,模拟执行mouseleave,即自动滚动
-}
+};
 
 /**
- * 带箭头的图标滚动
- * @constructor zUI.app.pictureScroll
+ * 滚动的幻灯片
+ * @constructor zUI.app.slides
  * @extends zUI.app
  * @requires zUI.base
+ * @param {Object} options 页面传过来的对象
+ * @param {Object} options.trigger 目标容器，用来放置幻灯片容器
+ * @param {boolean} options.isBtn 是否需要按钮，默认true
+ * @param {boolean} options.isArrow 是否需要箭头，默认true
+ * @param {boolean} options.index 幻灯片索引，默认从第一个开始，也就是0
+ * @param {number} options.time 幻灯片切换时间，默认为3000ms
+ * @param {boolean} options.isAuto 是否自动播放，默认true
+ * @param {string} options.direction 向左还是向上切换，选项up、left，默认up
  */
-zUI.app.pictureScroll = function(options){
-	
-}
+zUI.app.slides = function(options){
+	var o = options || {};
+	if(!o.trigger){return;}
+	var trigger     = $(o.trigger),
+		isBtn       = o.isBtn === undefined ? true : o.isBtn,
+		isArrow     = o.isArrow === undefined ? true : o.isArrow, //是否需要箭头
+		index       = o.index ? o.index : 0,
+		time        = o.time ? o.time : 3000,
+		direction   = o.direction ? o.direction : 'up',
+		timer       = null,
+		isAuto      = o.isAuto === undefined ? true : o.isAuto,
+		content     = trigger.find(o.content),
+		item        = content.find('li'),
+		itemLen     = item.length,
+		itemHeight  = item.height(),
+		itemWidth   = item.width(),
+		createBtn   = function(){
+							var i    = 0,
+								html = '';
+							for(; i < itemLen; i++){
+								html += '<li'+ ( index === i ? ' class="on"' : '' ) +'>'+ (i+1) +'</li>';
+							}
+							var btnWrap = trigger.append('<ul class="l-ui-slidesBtn"></ul>')
+										      .find('.l-ui-slidesBtn')
+										      .append(html),   
+							    btnItem = btnWrap.find('li')
+												 .css({filter:'Alpha(opacity=50)'})
+										         .mousemove(function(){
+													index = btnItem.index( $(this) );
+													switchable();
+													clearInterval(timer);
+												})
+												.mouseout(function(){
+													clearInterval(timer);
+													timer = setInterval(function(){
+														autoFn();
+													}, time);
+												});
+						},
+		createArrow = function(){
+							var arrowWrap = trigger.append('<div class="l-ui-slidesArrow"><a href="javascript:;" class="l-ui-slidesArrow-btn l-ui-slidesArrow-left">&lt;</a><a href="javascript:;" class="l-ui-slidesArrow-btn l-ui-slidesArrow-right">&gt;</a></div>'),
+								arrowItem = arrowWrap.find('a')
+													 .css({filter:'Alpha(opacity=50)'})
+													 .click(function(){
+														/*判断点击左侧还是右侧*/
+														if( $(this).hasClass('l-ui-slidesArrow-right') ){
+															index++;
+															if( index === itemLen ){
+																index = 0;
+															}
+														}else{
+															if( index === 0 ){
+																index = itemLen;
+															}
+															--index;
+														}
+														switchable();
+														clearInterval(timer);
+													 })
+													 .mouseout(function(){
+														clearInterval(timer);
+														timer = setInterval(function(){
+																	autoFn();
+																}, time);
+													 });
+						},
+		autoFn      = function(){
+							if(isAuto){
+								if(index === itemLen){
+									index = 0;
+								}
+								switchable();
+								index ++;
+							}
+					    },
+		switchable  = function(){
+
+							/*判断方向*/
+							if( direction === 'up' ){
+								var marginTop = -index * itemHeight;
+								content.stop().animate({top:marginTop}, 800);
+							}else{
+								var marginLeft = -index * itemWidth;
+								item.css({float:'left'});
+								content.stop().animate({left:marginLeft}, 800);
+							}
+							
+							/*有按钮时*/
+							if( isBtn ){
+								trigger.find('.l-ui-slidesBtn li')
+									   .eq(index)
+									   .addClass('on')
+									   .siblings()
+									   .removeClass('on');
+							}
+						}
+		
+		/*创建按钮*/
+		if( isBtn ){
+			createBtn();
+		}
+		
+		/*创建箭头*/
+		if( isArrow ){
+			createArrow();
+		}
+		
+		/*初始化*/
+		timer = setInterval(function(){
+			autoFn();
+		}, time);
+};
 
 /**
- * 带箭头的图标滚动
- * @constructor zUI.app.slidesUp
+ * EmailSuggest 邮箱建议
+ * @constructor zUI.app.emailsuggest
  * @extends zUI.app
  * @requires zUI.base
- */
-zUI.app.slidesUp = function(options){
+ * @param {Object} options 页面传过来的对象
+ * @param {Object} options.trigger 目标对象，最后返回的值将传给该对象
+ * @param {Object} options.data 邮箱数据
+ * @example 
+	js:
+		var arr = [
+					'163.com',
+					'126.com',
+					'qq.com',
+					'yahoo.com.cn',
+					'qq1.com',
+					'gmail.com',
+					'sohu.com',
+					'qq2.com',
+					'hotmail.com'
+				];
+		zUI.app.emailsuggest({
+			data: arr,
+			trigger: '#email'
+		});
+	dom: 
+		<input type="text" id="email" class="ui-input" />
+*/
+zUI.app.emailsuggest = function(options){
+	var o = options || {};
+	if(!o.trigger){return;}
+	var trigger  = $(o.trigger).attr('autocomplete','off'),
+		data     = o.data || ['163.com', '126.com', 'qq.com', 'yahoo.com.cn', 'gmail.com', 'sohu.com', 'hotmail.com'],
+		parent   = trigger.wrap('<div class="l-app-emailsuggestWrap"></div>').parent().append('<div class="l-app-emailsuggestList"></div>'),
+		listWrap = parent.find('.l-app-emailsuggestList').css({top:trigger.outerHeight() - 1, width:trigger.outerWidth()}).attr('index', 0),
+		createFn = function(val, arr){
+						var arr = arr === undefined ? data : arr,
+							len = arr.length,
+							str = '',
+							i   = 0;
+						for(; i<len; i++){
+							str += '<li>'+ val +'@' + arr[i] + '</li>';
+						}
+						listWrap.show().html('<ul>'+str+'</ul>');
+					},
+		keymove  = function(isDown){
+						var item = listWrap.find('li'),
+							len  = item.length;
+						if( isDown ){
+							var index = listWrap.attr('index') == len ? 0 : listWrap.attr('index');
+							item.eq(index++).addClass('current');
+							listWrap.attr('index', index);
+						}else{
+							var index = listWrap.attr('index') == 0 ? len : listWrap.attr('index');
+							item.eq(--index).addClass('current');
+							listWrap.attr('index', index);
+						}
+					},
+		closeFn  = function(){
+						listWrap.hide().html('').attr('index', 0);
+					}
 	
-}
+	trigger.keyup(function(e){
+		var v = trigger.val(),
+			v = v.trim(v),
+			s = v.replace(/@.*/, ""),
+			k = e.keyCode;
+
+		if( s.length ){
+			
+			if( /@/.test(v) ){
+				/*重写data数组*/
+				var str = v.replace(/.*@/, ""),
+					arr = $.map(data, function(n){
+								var reg = new RegExp(str);	
+								if(reg.test(n)){
+									return n;	
+								}
+							});
+				createFn(s, arr);
+			}else{
+				createFn(s);
+			}
+			
+			/*键盘事件处理*/
+			switch( k ){
+				case 40: //向下
+					keymove(true);
+					e.preventDefault();
+				break;
+				
+				case 38: //向上
+					keymove(false);
+					e.preventDefault();
+				break;
+				
+				case 13: //回车
+					var index = listWrap.attr('index') - 1;
+					trigger.val( listWrap.find('li').eq(index).html() );
+					e.preventDefault();
+					closeFn();
+				break;
+				
+				default:
+					listWrap.attr('index', 0)
+			}
+			
+			/*鼠标事件处理*/
+			listWrap.find('li').click(function(){
+				trigger.val( $(this).html() );
+				closeFn();
+			}).hover(function(){
+				$(this).addClass('current');
+			},function(){
+				$(this).removeClass('current');
+			});
+		}else{
+			closeFn();
+		}
+	});
+};
+
+/**
+ * Slider 滑动条
+ * @constructor zUI.app.slider
+ * @extends zUI.app 
+ * @requires zUI.base zUI.ui.mousePosition()
+ * @param {Object} options 页面传过来的对象
+ * @param {Object} options.trigger 目标对象
+ * @param {number} options.min 最小值
+ * @param {number} options.max 最大值
+ * @param {number} options.ratio 默认占比，其中默认占比和默认值互斥，两个都有设置时，忽略值
+ * @param {number} options.value 默认值
+ * @param {string} options.axis 滑动方向，可选为x、y，默认x
+ * @example 
+	js:
+		zUI.app.slider({
+			trigger: '#slider',
+			callback: function(val){
+				$('#demoText').html(val);
+			}
+		})
+	dom: 
+		<div class="l-sliderWrap fn-left" id="slider">
+			<div class="l-sliderBtn"></div>
+			<div class="l-sliderComplete"></div>
+		</div>
+		<div id="demoText" class="demoText"></div>
+*/
+zUI.app.slider = function(options){
+	var o = options || {};
+	if(!o.trigger){return;}
+	var trigger  = $(o.trigger),
+		min      = o.min === undefined ? -100 : o.min,
+		max      = o.max === undefined ? 100 : o.max,
+		ratio    = o.ratio || 0,                       //默认占比，其中默认占比和默认值互斥，两个都有设置时，忽略值
+		value    = o.value || 0,                       //默认值
+		axis     = o.axis || 'x',                      //滑动方向
+		isX      = axis === 'x',
+		callback = o.callback,                         //返回函数
+		triggerW = trigger.width(),                    //容器宽度
+		triggerH = trigger.height(),                   //容器高度
+		complete = trigger.find('.l-sliderComplete'),  //刻度
+		btn      = trigger.find('.l-sliderBtn'),       //按钮宽度
+		btnW     = btn.width(),                        //按钮宽度
+		btnH     = btn.height(),                       //按钮高度
+		offset   = btn.offset(),
+		triggerT = offset.top,
+		triggerL = offset.left,
+		isMove   = false,                              //是否移动
+		setValue = function(val, isComputed){
+						var total = isX ? (triggerW - btnW) : (triggerH - btnH) //容器大小
+						if( isComputed ){
+							var number         = isX ? (val - btnW) : (val - btnH),           //游标位置
+								currentValue   = min + number/total * (max - min),            //当前值
+								currentPercent = number/total*100;                            //当前百分比
+						}else{
+							// 初始化
+							if( o.value && o.ratio === undefined ){
+								var number         = (value - min) * total / (max - min),
+									currentValue   = value,
+									currentPercent = number/total*100;
+							}else{
+								var number         = val/100*total,
+									currentValue   = min + number/total * (max - min),
+									currentPercent = val;
+							}
+						}
+							
+						if( isX ){
+							btn.css({left:number});
+							complete.css({width:number, height:'100%'});
+						}else{
+							btn.css({top:number})
+							complete.css({width:'100%', height:number});
+						}
+						
+						if( zUI.base.isFunction(callback) ){
+							var obj = {
+								val : currentValue.toFixed(0),    //当前值
+								per : currentPercent.toFixed(0)+'%'  //当前百分比
+							}
+							callback(obj);
+						}
+					},
+		drag     = function(e){
+						var e        = window.event || e,
+						    position = zUI.ui.mousePosition(),
+							x        = position.positionX - triggerL,
+							y        = position.positionY - triggerT,
+							btnV     = isX ? btnW : btnH,
+							val      = isX ? x : y,
+							triggerV = isX ? triggerW : triggerH;
+							
+						if( val < btnV ){
+							setValue(btnV, true);
+						}else if(val > triggerV){
+							setValue(triggerV, true);
+						}else{
+							setValue(val, true);
+						}
+					}
+					
+	//初始化
+	setValue(ratio, false);
+	
+	btn.mousedown(function(e){
+		isMove = true;
+		var e = window.event || e;
+		if(window.event){
+			e.cancelBubble = true;
+		}else{
+			e.stopPropagation();
+		}
+		e.preventDefault(); //阻止默认动作
+	});
+
+	$(document).bind('mousemove', function(){
+		if( isMove ){
+			drag();
+		}
+	}).bind('mouseup', function(){
+		isMove = false;
+	});
+	
+	trigger.mousedown(function(e){
+		drag();
+	});
+	
+};
+
+/**
+ * sortable 拖拽排序（目前只支持一个单个拖拽）
+ * @constructor zUI.app.sortable
+ * @extends zUI.app
+ * @requires zUI.base zUI.ui.zIndex() zUI.ui.mousePosition() zUI.ui.wrap()
+ * @param {Object} options 页面传过来的对象
+ * @param {Object} options.trigger 目标对象
+ * @example 
+	js:
+		zUI.app.sortable({
+			trigger: '#sortable2'
+		});
+	dom: 
+		<div class="l-sortableWrap fn-left" id="sortable2">
+			<div class="l-sortableItem">1</div>
+			<div class="l-sortableItem">2</div>
+			<div class="l-sortableItem">3</div>
+			<div class="l-sortableItem">4</div>
+			<div class="l-sortableItem">5</div>
+		</div>
+*/
+zUI.app.sortable = function(options){
+	var o = options || {};
+	if(!o.trigger){return;}
+	var trigger  = $(o.trigger),
+		callback = o.callback,                         //返回函数
+		item     = trigger.find('.l-sortableItem'),     //按钮宽度
+		//connect  = o.connect ? o.connect : null,
+		current  = null,
+		isMove   = false,
+		start    = function(){
+						/*插入容器*/
+						zUI.ui.wrap();
+						
+						var offset = current.css({opacity:'0.3'})
+											.offset(),
+							top    = offset.top,
+							left   = offset.left,
+							width  = current.width(),
+							height = current.height(),
+							zIndex = zUI.ui.zIndex(),
+							proxy  = $('#l-ui-wrap').append('<div id="l-sortable-proxy"></div>')
+													.find('#l-sortable-proxy')
+													.css({width:width, height:height, zIndex: zIndex, top:top, left:left});
+					},
+		end      = function(){
+						current.animate({opacity : '1'});
+						$('#l-sortable-proxy').remove();
+						if( zUI.base.isFunction(callback) ){
+							callback();
+						}
+					},
+		drag     = function(e){
+						var next     = current.next(),
+							prev     = current.prev(),
+							offset   = current.offset(),
+							top      = offset.top,
+							left     = offset.left,
+							width    = current.outerWidth(),
+							height   = current.outerHeight(),
+							e        = window.event || e,
+						    position = zUI.ui.mousePosition(),
+							x        = position.positionX,
+							y        = position.positionY;
+						
+						switch (true) {
+							case y < top - height:
+								prev.before(current);
+								break;
+							case y > top + height:
+								next.after(current);
+								break;
+						}
+						
+						// if( connect ){
+							// $(connect).find('.l-sortableItem').bind('mouseover', function(){
+								// $(this).after(current);
+								// console.log('ss')
+							// })
+						// }
+
+						//移动虚线框
+						$('#l-sortable-proxy').css({top:y, left:x});
+					}	
+	
+	/*拖拽开始*/
+	item.bind('mousedown', function(e){
+		isMove  = true;
+		current = $(this);
+		start();
+		e.preventDefault(); //阻止默认动作
+	});
+	
+	$(document).bind('mousemove', function(){
+		if( isMove ){
+			drag();
+		}
+	}).bind('mouseup', function(){
+		if( isMove ){
+			end();
+			isMove  = false;
+		}
+	});		
+};
+
+
+/**
+ * zoom 图片放大
+ * @class zUI.app.BaseZoom
+ * @constructor
+ * @extends zUI.app
+ * @requires zUI.ui.mousePosition()
+ * @author norion
+ */
+
+zUI.app.BaseZoom = function(){
+	var g = this;
+	
+	/**
+	 * 目标原图
+	 * @member zUI.app.BaseZoom
+	 */
+	this.trigger = {};
+	
+	/**
+	 * 大图对象
+	 * @member zUI.app.BaseZoom
+	 */
+	this.big = {};
+	
+	/**
+	 * 初始化
+	 * @member zUI.app.BaseZoom
+	 * @param {Object} options.options 目标对象
+	 * @param {Number} options.bigHeight 大图高度
+	 * @param {Boolean} options.bigWidth 大图宽度
+	 * @return {Object} zUI.app.BaseZoom
+	 */
+	this.init = function(options){
+		var o = options || {};
+		if(!o.trigger){return;}
+		var trigger  = $(o.trigger).addClass('l-ui-zoom'),
+			offset   = trigger.offset(),
+			triggerT = offset.top,
+			triggerL = offset.left,
+			triggerH = trigger.height(),
+			triggerW = trigger.width(),
+			wrap     = trigger.wrap('<div class="l-ui-zoomWrap" style="height:'+ triggerH +'px;width:'+ triggerW +'px;"></div>')
+							  .parent(),
+			big      = wrap.append('<div class="l-ui-zoomBig"><img src="'+ trigger.find('img').attr('zoom') +'" /></div>')
+						   .find('.l-ui-zoomBig'),
+			bigH     = o.bigHeight || 350,
+			bigW     = o.bigWidth || 350,			   
+			mask     = wrap.append('<div class="l-ui-zoomMask"></div>')
+						   .find('.l-ui-zoomMask'),
+			maskH    = mask.outerHeight(),
+			maskW    = mask.outerWidth();
+			
+		wrap.mouseover(function(){
+				big.css({display:'block', left:triggerW + 10, width:bigW, height:bigH});
+				mask.css({display:'block', filter:'Alpha(opacity=40)'});
+			})
+			.mousemove(function(e){
+				var e        = window.event || e,
+					position = zUI.ui.mousePosition(),
+					px       = position.positionX,
+					py       = position.positionY,
+					x        = px - maskW/2 - triggerL,
+					y        = py - maskH/2 - triggerT,
+					l        = x < 0 ? 0 : x > triggerW - maskW ? triggerW - maskW : x,
+					t        = y < 0 ? 0 : y > triggerH - maskH ? triggerH - maskH : y,
+					bigImg   = big.find('img'),
+					bigImgH  = bigImg.outerHeight(),
+					bigImgW  = bigImg.outerWidth(),
+					bigL     = l / (triggerW - maskW) * (bigW - bigImgW),
+					bigT     = t / (triggerH - maskH) * (bigH - bigImgH);
+					
+				if( px <= triggerL + triggerW && px >= triggerL && py <= triggerT + triggerH && py >= triggerT){
+					bigImg.css({top:bigT, left:bigL, position:'absolute'});
+					mask.css({top:t, left:l});
+				}else{
+					big.hide();
+					mask.hide();
+				}
+			}).mouseout(function(){
+				big.hide();
+				mask.hide();
+			});
+			
+		g.trigger = trigger;
+		g.big = big;
+			
+		return g;
+	};
+	
+	/**
+	* 刷新
+	* @member zUI.app.BaseZoom
+	* @param {string} 要刷新的html
+	* @return {Object} zUI.app.BaseZoom
+	*/
+	this.reflash = function(html){
+		var trigger = g.trigger,
+			big     = g.big;
+		trigger.html(html);
+		big.html('<img src="'+ trigger.find('img').attr('zoom') +'" />')
+		return g;
+	};
+};
+zUI.app.zoom = function(options){
+	var zoom = new zUI.app.BaseZoom();
+	zoom.init(options);
+	return zoom;
+};
+
+/**
+ * 日历
+ * @constructor zUI.app.calendar
+ * @extends zUI.app
+ * @requires zUI.base
+ * @param {Object} options 页面传过来的对象
+ * @param {Object} options.trigger 目标对象
+ * @param {number} options.top 相对于trigger的y坐标
+ * @param {number} options.left 相对于trigger的x坐标
+ * @param {Object} options.callback 回调函数
+ * @param {number} options.beginYear 开始年
+ * @param {number} options.endYear 结束年
+ * @param {Object} options.language 语言数据
+ * @param {string} options.dateFormat 时间格式，选项yyyy-MM-dd hh:mm:ss \ yyyy-MM-dd，默认yyyy-MM-dd hh:mm:ss
+ * @param {Object} options.date 时间数据，默认本地时间
+ * @example 
+	zUI.app.calendar({
+		trigger:'#calendar',
+		dateFormat:'yyyy-MM-dd hh:mm:ss',
+		beginYear:'1970',
+		endYear:'2030',
+		callback: function(time){
+			alert(time)
+		}
+	});
+ */
+zUI.app.calendar = function(options){
+	var o = options || {};
+	if(!o.trigger){return;}
+	var trigger    = $(o.trigger).wrap('<div class="l-ui-calendarWrap"></div>'),
+		wrap       = trigger.parent(),
+		top        = o.top || trigger.outerHeight(),
+		left       = o.left || 0,
+		main       = wrap.append('<div class="l-ui-calendarMain" style="top:'+ top +'px;left:'+ left +'px"></div>')
+						 .find('.l-ui-calendarMain'),
+		callback   = o.callback,
+		beginYear  = Number(o.beginYear) || 1980,
+		endYear    = Number(o.endYear) ||  2050,
+		language   = o.language || {
+										next: '上个月',
+										prev: '下个月',
+										submit: '提交',
+										year: '年',
+										month: '月',
+										time: '时间',
+										weeks: ['日', '一', '二', '三', '四', '五', '六']
+									},
+		days       = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+		weeks      = language.weeks,
+		months     = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+		dateFormat = o.dateFormat || 'yyyy-MM-dd hh:mm:ss',
+		date       = o.date || new Date(),
+		globalDate = date,
+		isShowTime = /(h+)/.test(dateFormat),
+		
+		/**
+		 * 日历内部构造
+		 * @private
+		 */
+		_core      = {
+						/**
+						 * 格式化日期
+						 * @param {Number} 年
+						 * @param {Number} 月
+						 * @param {Number} 日
+						 * @param {Number} 小时
+						 * @param {Number} 分钟
+						 * @param {Number} 秒钟
+						 * @param {Number} 周
+						 * @param {Number} 四季
+						 * @param {Number} 毫秒
+						 */
+						format: function(year, month, day, hour, minute, second, week, quarter, millisecond){
+							var o = {
+									// "M+" : month + 1 || date.getMonth() + 1,                                       //month
+									// "d+" : day || date.getDate(),                                                  //day
+									// "h+" : hour || date.getHours(),                                                //hour
+									// "m+" : minute || date.getMinutes(),                                            //minute
+									// "s+" : second || date.getSeconds(),                                            //second
+									// "w+" : weeks[week] || weeks[date.getDay()],                                    //week
+									// "q+" : Math.floor((quarter + 3) / 3) || Math.floor((date.getMonth() + 3) / 3), //quarter
+									// "S"  : millisecond || date.getMilliseconds()                                   //millisecond
+									'M+': month + 1,
+									'd+': day,
+									'h+': hour,
+									'm+': minute,
+									's+': second,
+									'w+': weeks[week],
+									'q+': Math.floor((quarter + 3) / 3),
+									'S' : millisecond
+								},
+								year = year.toString(),
+								str  = dateFormat;
+								
+							if( /(y+)/.test(str) ){
+								str = str.replace(/(y+)/, year.substr(4 - Math.min(4, RegExp.$1.length)));
+							}
+							for( var k in o ){
+								if(	new RegExp("("+ k +")").test(str) ){
+									if(	o[k] !== undefined && !isNaN(o[k]) ){
+										str = str.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+									}else{
+										str = str.replace(/\s[^\d](.)*/, '')
+									}
+								}
+							}
+							return str;
+						},
+					
+						/**
+						 * 判断闰年
+						 * @param {Number} 年
+						 */
+						isLeapYear: function(y){
+							if((y % 400 === 0) || (y % 100 !== 0) && (y % 4 === 0)){
+								return true;
+							}
+							return false;
+						},
+						
+						/**
+						 * 获取月份天数
+						 * @param {Number} 年
+						 * @param {Number} 月
+						 */
+						getDayCount: function(y, m){
+							if( _core.isLeapYear(y, m) ){
+								days[1] = 29;
+							}else{
+								days[1] = 28;
+							}
+							return days[m];
+						},
+						
+						/**
+						 * 获取新date
+						 * @param {Number} 年
+						 * @param {Number} 月
+						 * @param {Number} 日
+						 */
+						getNewDate: function(y, m, d) {
+							var newDate = new Date();
+							newDate.setFullYear(y, m, d);
+							// !isNaN(y) && newDate.setFullYear(y);
+							// !isNaN(m) && newDate.setMonth(m);
+							// !isNaN(d) && newDate.setDate(d);
+							return newDate;
+						},
+						
+						/**
+						 * 获取上下月
+						 * @param {Number} 递增活递减
+						 */
+						getPrevNextMonth: function(poor){
+							var y = globalDate.getFullYear(),
+								m = globalDate.getMonth() + poor;
+							if(m < 0){
+								y -= 1;
+								m = 11;
+							}else if(m > 11){
+								y += 1;
+								m = 0;
+							}
+							return _core.getNewDate(y, m, 1);
+						},
+						
+						/**
+						 * 获取上月
+						 * @param {return} _core.getPrevNextMonth(-1)
+						 */
+						getPrevDate: function(){
+							return _core.getPrevNextMonth(-1);
+						},
+						
+						/**
+						 * 获取上月
+						 * @param {return} _core.getPrevNextMonth(1);
+						 */
+						getNextDate: function(){
+							return _core.getPrevNextMonth(1);
+						},
+						
+						/**
+						 * 创建头部
+						 */
+						createHeader: function(){
+							var html     = '',
+								yearLen  = endYear - beginYear,
+								i        = 0,
+								monthLen = 12,
+								n        = 0;
+								
+							html += '<a class="l-ui-calendarHeader-btn l-ui-calendarHeader-prev" href="javascript:;" title="'+ language.prev +'"></a>';
+							html += '<div class="l-ui-calendarHeader-text">';
+							html += '<select class="l-ui-calendarHeader-year">';
+							for(; i < yearLen; i++){
+								var year = beginYear + i;
+								if( year === globalDate.getFullYear() ){
+									html += '<option value="'+ year +'" selected>'+ year +'</option>';
+								}else{
+									html += '<option value="'+ year +'">'+ year +'</option>';
+								}
+							}
+							html += '</select>' + language.year;
+							html += '<select class="l-ui-calendarHeader-month">';
+							for(; n < monthLen; n++){
+								var month = months[n];
+								if( n === globalDate.getMonth() ){
+									html += '<option value="'+ n +'" selected>'+ month +'</option>';
+								}else{
+									html += '<option value="'+ n +'">'+ month +'</option>';
+								}
+							}
+							html += '</select>' + language.month;
+							html += '</div>';
+							html += '<a class="l-ui-calendarHeader-btn l-ui-calendarHeader-next" href="javascript:;" title="'+ language.next +'"></a>';
+							
+							return '<div class="l-ui-calendarHeader fn-clear">'+ html +'</div>';
+						},
+						
+						/**
+						 * 创建周
+						 */
+						createWeeks: function(){
+							var html = '',
+								i    = 0;
+							html += '<div class="l-ui-calendarWeeks fn-clear">';
+							for(; i < 7; i++){
+								if( i == 0 ){
+									html += '<span class="l-ui-calendarWeek l-ui-calendarWeek-sunday">'+ weeks[i] +'</span>';
+								}else if( i == 6 ){
+									html += '<span class="l-ui-calendarWeek l-ui-calendarWeek-saturday">'+ weeks[i] +'</span>';
+								}else{
+									html += '<span class="l-ui-calendarWeek">'+ weeks[i] +'</span>';
+								}
+							}
+							html += '</div>';
+							return html;
+						},
+						
+						/**
+						 * 创建日
+						 */
+						createDays: function(){
+							var //year       = date.getFullYear(),
+								//month      = date.getMonth(),
+								day        = date.getDate(),
+								curYear    = globalDate.getFullYear(),              //当前全局date对象
+								curMonth   = globalDate.getMonth(),
+								curDay     = globalDate.getDate(),
+								curDayNum  = _core.getDayCount(curYear, curMonth),
+								prevDate   = _core.getPrevDate(),                    //获取上月的date
+								prevYear   = prevDate.getFullYear(),
+								prevMonth  = prevDate.getMonth(),
+								prevDayNum = _core.getDayCount(prevYear, prevMonth),
+								nextDate   = _core.getNextDate(),                    //获取下月的date
+								nextYear   = nextDate.getFullYear(),
+								nextMonth  = nextDate.getMonth(),
+								lastWeek   = new Date(curYear, curMonth, 1).getDay(), //获取本月1号的星期数
+								html       = '',
+								p          = prevDayNum - lastWeek +1,               //上月剩余天数(礼拜从礼拜日算起)
+								nextDayNuM = 42 - lastWeek - curDayNum,              //下月剩余天数
+								i          = 1,
+								n          = 1;
+
+							for(; p <= prevDayNum; p++) {
+								var prevDayStr =  _core.format(prevYear, prevMonth, p);
+								html += '<a href="javascript:;" class="l-ui-calendarDay l-ui-calendarDay-prev l-ui-calendarDay-disable" title="'+ prevDayStr +'" year="'+ prevYear +'" month="'+ prevMonth +'">'+ p +'</a>';
+							}
+							
+							for(; i <= curDayNum; i++){
+								var cls       = '',
+									curDayStr = _core.format(curYear, curMonth, i)
+								if( day === i ){
+									cls = ' l-ui-calendarDay-current'
+								}
+								html += '<a href="javascript:;" class="l-ui-calendarDay'+ cls +'" title="'+ curDayStr +'" year="'+ curYear +'" month="'+ curMonth +'">'+ i+'</a>';
+							}
+							
+							for(; n <= nextDayNuM; n++) {
+								var nextDayStr =  _core.format(nextYear, nextMonth, n);
+								html += '<a href="javascript:;" class="l-ui-calendarDay l-ui-calendarDay-next l-ui-calendarDay-disable" title="'+ nextDayStr +'" year="'+ nextYear +'" month="'+ nextMonth +'">'+ n +'</a>';
+							}
+											
+							return '<div class="l-ui-calendarDays fn-clear">'+ html +'</div>';
+						},
+						
+						/**
+						 * 创建时间
+						 */
+						createTime: function(){
+							var hour       = date.getHours(),
+								minute     = date.getMinutes(),
+								second     = date.getSeconds(),
+								hourHtml   = '',
+								minuteHtml = '',
+								secondHtml = '',
+								h          = 0,
+								m          = 0,
+								s          = 0;
+								
+							hour   = hour < 10 ? '0' + hour  : hour;
+							minute = minute < 10 ? '0' + minute  : minute;
+							second = second < 10 ? '0' + second  : second;
+							
+							for(; h < 24; h++){
+								hourHtml += '<a href="javascript:;">'+ (h < 10 ? '0' + h  : h) +'</a>';
+							}
+							
+							for(; m < 60; m++){
+								minuteHtml += '<a href="javascript:;">'+ (m < 10 ? '0' + m  : m) +'</a>';
+							}
+							
+							for(; s < 60; s++){
+								secondHtml += '<a href="javascript:;">'+ (s < 10 ? '0' + s  : s) +'</a>';
+							}
+								
+							return  '<div class="l-ui-calendarTime fn-clear">' +
+										'<div class="l-ui-calendarTimeTitle">'+ language.time +':</div>' + 
+										'<div class="l-ui-calendarTimeWrap fn-clear">' +
+											'<div class="l-ui-calendarTime-timeWrap l-ui-calendarTime-hourWrap">' +
+												'<input type="text" class="l-ui-calendarTime-hourInput" value="'+ hour +'" /><span>:</span>' +
+												'<div class="l-ui-calendarTime-hour">'+ hourHtml +'</div>' +
+											'</div>' + 
+											'<div class="l-ui-calendarTime-timeWrap l-ui-calendarTime-minuteWrap">' + 
+												'<input type="text" class="l-ui-calendarTime-minuteInput" value="'+ minute +'" /><span>:</span>' + 
+												'<div class="l-ui-calendarTime-minute">'+ minuteHtml +'</div>' + 
+											'</div>' + 
+											'<div class="l-ui-calendarTime-timeWrap l-ui-calendarTime-secondWrap">'  +
+												'<input type="text" class="l-ui-calendarTime-secondInput" value="'+ second +'" />' + 
+												'<div class="l-ui-calendarTime-second">'+ secondHtml +'</div>' + 
+											'</div>'  +
+										'</div>' + 
+										'<a href="javascript:;" class="l-ui-calendarTimeBtn">'+ language.submit +'</a>' +
+									'</div>';
+						},
+						
+						/**
+						 * 点击下个月
+						 */
+						clickNext: function(){
+							globalDate = _core.getPrevNextMonth(1);
+							_core.init();
+						},
+						
+						/**
+						 * 点击上个月
+						 */
+						clickPrev: function(){
+							globalDate = _core.getPrevNextMonth(-1);
+							_core.init();
+						},
+						
+						/**
+						 * 年月选择
+						 */
+						clickYearMonth: function(year, month){
+							globalDate = new Date(year, month, 1);
+							_core.init();
+						},
+						
+						/**
+						 * 关闭日历
+						 */
+						close: function(val){
+							trigger.val(val);
+							main.hide();
+							if( zUI.base.isFunction(callback) ){
+								callback(val);
+							}
+						},
+			 
+						/**
+						 * 初始化函数
+						 */
+						init: function(){
+							main.html(_core.createHeader() + _core.createWeeks() + _core.createDays());
+							
+							main.find('.l-ui-calendarHeader-prev').click(function(){
+								_core.clickPrev();
+							});
+							main.find('.l-ui-calendarHeader-next').click(function(){
+								_core.clickNext();
+							});
+
+							main.find('.l-ui-calendarHeader-month').change(function(){
+								var year  = main.find('.l-ui-calendarHeader-year').val(),
+									month = $(this).val();
+								_core.clickYearMonth(year, month);
+							});
+							main.find('.l-ui-calendarHeader-year').change(function(){
+								var year  = $(this).val(),
+									month = main.find('.l-ui-calendarHeader-month').val();
+								_core.clickYearMonth(year, month);
+							});
+							
+							main.find('.l-ui-calendarDay').each(function(i){
+								var saturday = i%7 === 6 ? ' l-ui-calendarDay-saturday' : '',
+									sunday   = i%7 === 0 ? ' l-ui-calendarDay-sunday' : ''
+								$(this).addClass(saturday+sunday)
+							}).click(function(){
+								var self = $(this),
+									val  = self.attr('title');
+									
+								self.addClass('l-ui-calendarDay-current')
+									.siblings()
+									.removeClass('l-ui-calendarDay-current');
+									
+								if( !isShowTime ){
+									_core.close(val);
+								}else{
+									var curYear  = self.attr('year'),
+										curMonth = self.attr('month'),
+										curDay   = self.text();
+									
+									globalDate = _core.getNewDate(curYear, curMonth, curDay);
+								}
+							});
+							
+							if( isShowTime ){
+								if( !main.find('.l-ui-calendarTime').length ){
+									main.append(_core.createTime())
+								}
+			 
+								var hourInput   = main.find('.l-ui-calendarTime-hourInput'),
+									minuteInput = main.find('.l-ui-calendarTime-minuteInput'),
+									secondInput = main.find('.l-ui-calendarTime-secondInput'),
+									inputTime   = function( o ){
+													o.siblings('div')
+													 .show()
+													 .find('a')
+													 .click(function(){
+														o.val( $(this).text() )
+														 .siblings('div')
+														 .hide();
+													 });
+													o.parent().siblings().find('div').hide();
+												}
+								
+								hourInput.click(function(){
+									inputTime( $(this) );
+								});
+								minuteInput.click(function(){
+									inputTime( $(this) );
+								});
+								secondInput.click(function(){
+									inputTime( $(this) );
+								});
+								main.find('.l-ui-calendarTimeBtn').click(function(){
+									var hour     = hourInput.val(),
+										minute   = minuteInput.val(),
+										second   = secondInput.val(),
+										curYear  = globalDate.getFullYear(),  //当前全局date对象
+										curMonth = globalDate.getMonth(),
+										curDay   = globalDate.getDate(),
+										val      = _core.format(curYear, curMonth, curDay, hour, minute, second);
+									
+									_core.close(val);
+								});
+							}
+						}
+					}
+	
+	_core.init();
+	trigger.click(function(){
+		main.show();
+	});
+};
+
+/**
+ * 编辑器
+ * @constructor zUI.app.editor
+ * @extends zUI.app
+ * @requires zUI.base zUI.ui.pop zUI.base.browser
+ * @param {Object} options 页面传过来的对象
+ * @param {Object} options.trigger 目标对象
+ * @param {Object} options.width 编辑器的宽度
+ * @param {Object} options.height 编辑器的高度
+ * @example 
+	html:
+		<textarea id="editor"></textarea>
+	js:
+		zUI.app.editor({
+			trigger:'#editor',
+			callback: function(time){
+				alert(time)
+			}
+		});
+	
+ */
+zUI.app.editor = function(options){
+	var o = options || {};
+	if(!o.trigger){return;};
+	var trigger    = $(o.trigger).wrap('<div class="l-ui-editorWrap"></div>').hide(),
+		width      = o.width || 600,
+		height     = o.height || 300,
+		wrap       = trigger.parent().css({width:width,height:height}),
+		text       = trigger.html(),
+		browser    = zUI.base.browser,
+		data       = [
+						{name: 'bold', title: '加粗'},
+						{name: 'italic', title: '斜体'},
+						{name: 'strikethrough', title: '删除线'},
+						{name: 'insertOrderedList', title:'序号式列表'},
+						{name: 'insertUnorderedList', title:'非序号式列表'},
+						{name: 'justifyleft', title: '左对齐'},
+						{name: 'justifycenter', title: '居中对齐'},
+						{name: 'justifyright', title: '右对齐'},
+						{name: 'createlink', title:'插入链接或编辑链接'},
+						{name: 'unlink', title:'取消链接'},
+						{name: 'insertImage', title:'插入图片'},
+						{name: 'fullscreen', title:'全屏显示'},
+						{name: 'source', title:'源码'}
+					],
+		/**
+		 * 编辑器内部构造
+		 * @private
+		 */
+		editor     = {
+			
+			/**
+			 * 初始化
+			 */
+			init: function () {
+
+				var _this = this;
+
+				_this.bookmark = null;
+
+				// 创建工具条
+				_this.createTool();
+
+				// 创建iframe容器
+				_this.createIframe();
+
+				// 创建快照书签
+				browser.msie && _this.saveBookMark();
+
+				wrap.find('.l-ui-editor-toolIco')
+					.mousedown(function(e){
+						var name = $(this).attr('name');
+						_this.exec(name);
+						// $('#editorWrap').append('<input type="text" name="" id="ss"><span id="dd">提交</span>');
+						// $('#dd').mousedown(function(e){
+						// 	_this.setCommand('insertImage', $('#ss').val)
+						// })
+					})
+					.keydown(function(e){
+						var k = e.keyCode;
+						if( k == 13 && !e.shiftKey ){
+							
+						}
+					});
+					
+				
+				_this.editorBox.blur(function(){
+					_this.setText();
+				});
+			},
+			
+			/**
+			 * 获取连接插入框
+			 */
+			getLink: function(){
+				var _this = this,
+					html  = '',
+					id    = 'l-pop-'+(new Date()).valueOf();
+
+				html += '<div id="link-options">' +
+							'<p class="howto">输入目标URL</p>' +
+							'<div>' +
+							'	<label><span>URL</span><input id="l-ui-editor-url" value="http://" type="text" name="href"></label>' +
+							'</div>' +
+							'<div>' +
+							'	<label><span>标题</span><input id="l-ui-editor-linkTitle" type="text" name="linktitle"></label>'
+							'</div>' +
+							'<div class="link-target">' +
+							'	<label><input type="checkbox" id="l-ui-editor-linkCheckbox"> 在新窗口或标签页打开链接</label>' +
+							'</div>' +
+						'</div>';
+						
+				zUI.ui.pop.open({
+					title:'插入链接',
+					width:200,
+					height:150,
+					html:html,
+					id:id,
+					btns:[
+						{
+							text:'插入链接',
+							onclick:function(){
+								var _val = $('#l-ui-editor-url').val();
+
+								zUI.ui.pop.close(id); //防止焦点在父级丢失，提前关闭
+								if (_val.length == 0)
+									_val = '#'; // IE下链接可以为空.但其他最起码有一个空格.否则报错
+								_this.setCommand('createLink', _val);
+							}
+						},
+						{
+							text:'取消',
+							onclick: function(){
+								
+							}
+						}
+					]
+				});		
+			},
+
+			/**
+			 * 全屏显示
+			 */
+			fullscreen: function(){
+				var _this = this;
+				
+				if( wrap.hasClass('l-ui-editorWrap-full') ){
+					wrap.removeClass('l-ui-editorWrap-full')
+						.css({width:'100%', height:height});
+					this.iframe.css({width:'100%', height:height - _this.toolHeight});
+					$('body').css({position:''});
+				}else{
+					var winHeight = $(window).height(),
+						iframeHeight = winHeight - wrap.find('.l-ui-editor-tool').outerHeight();
+					wrap.addClass('l-ui-editorWrap-full')
+						.css({width:'100%', height:winHeight});
+					this.iframe.css({width:'100%', height:iframeHeight});
+					$('body').css({position:'relative'});
+				}
+			},
+
+			/**
+			 * 获取图片插入框
+			 */
+			getImages: function(){
+				var _this = this,
+					html  = '',
+					id    = 'l-pop-'+(new Date()).valueOf();			
+				html += '<div id="link-options">' +
+							'<p class="howto">输入目标URL</p>' +
+							'<div>' +
+							'	<label><span>url</span><input id="l-ui-editor-img" type="text" name="linktitle"></label>' +
+							'</div>' +
+						'</div>';
+						
+				zUI.ui.pop.open({
+					title:'插入图片',
+					width:200,
+					height:150,
+					id:id,
+					html:html,
+					btns:[
+						{
+							text:'插入图片',
+							onclick:function(){
+								var url = $('#l-ui-editor-img').val();
+								zUI.ui.pop.close(id); //防止焦点在父级丢失，提前关闭
+								_this.setCommand('insertImage', url);
+							}
+						},
+						{
+							text:'取消',
+							onclick: function(){
+								
+							}
+						}
+					]
+				});
+			},
+
+			/**
+			 * 保存快照用于IE定位
+			 */
+			saveBookMark: function(){
+				var _this = this;
+
+				_this.ifr.attachEvent('onbeforedeactivate', function(){
+					var rng = _this.doc.selection.createRange();
+					if( rng.getBookmark ){
+						_this.bookmark = _this.doc.selection.createRange().getBookmark(); // 保存光标用selection下的createRange();
+					}
+				});
+
+				_this.ifr.attachEvent('onactivate', function(){
+					if( _this.bookmark ){
+						// Moves the start and end points of the current TextRange object to the positions represented by the specified bookmark.
+						// 将光标移动到 TextRange 所以需要用 body.createTextRange();
+						var rng = _this.doc.body.createTextRange();
+						rng.moveToBookmark( _this.bookmark );
+						rng.select();
+						_this.bookmark = null;
+					}
+				});
+			},
+			
+			/**
+			 * 获取Selection对象
+			 */
+			getSelection: function(){
+				var _this = this;
+				if (_this.win.getSelection){
+					return _this.win.getSelection();
+				}else if (_this.doc.selection) {
+					return _this.doc.selection.createRange();
+				}
+			},
+			
+			/**
+			 * 获取ParentNode对象
+			 */
+			getParentNode: function(){
+				var _this = this;
+				if (window.getSelection) return _this.getSelection().getRangeAt(0).startContainer.parentNode;
+				else if (document.selection) return _this.getSelection().parentElement();
+			},
+			
+			/**
+			 * 获取CurrentNode对象
+			 */
+			getCurrentNode: function(){
+				var _this = this;
+				if (window.getSelection) return _this.getSelection().getRangeAt(0).startContainer;
+				else if (document.selection) return _this.getSelection();
+			},
+			
+			/**
+			 * 获取html源码
+			 */
+			getSource: function(){
+				var _this = this,
+					btn   = wrap.find('.l-ui-editor-toolIco-source');
+										
+				if( btn.hasClass('l-ui-editor-toolIco-source-open') ){
+					_this.editorBox.html(trigger.hide().val())
+					btn.removeClass('l-ui-editor-toolIco-source-open');
+				}else{
+					trigger.show().val(_this.editorBox.html())
+					btn.addClass('l-ui-editor-toolIco-source-open');
+				}
+				
+			},
+			
+			/**
+			 * 执行操作
+			 * @param {string} 调用方式
+			 */
+			exec: function(cmd){
+				var _this = this;
+				switch (cmd){
+					// case 'insertUnorderedList':
+						// _this.getList(cmd,'ul');
+					// break;
+					// case 'insertOrderedList':
+						// _this.getList(cmd,'ol');
+					// break;
+					case 'createlink':
+						_this.getLink();
+					break;
+					case 'fullscreen':
+						_this.fullscreen();
+					break;
+					case 'source':
+						_this.getSource();
+					break;
+					case 'insertImage':
+						_this.getImages();
+					break;
+					default:
+						_this.setCommand(cmd);
+				}
+			},
+ 
+			/**
+			 * 执行命令
+			 * @param {string} document.execCommand的方法
+			 * @param {array} document.execCommand的方法
+			 */
+			setCommand: function(name, arg){
+				try {
+					this.ifr.contentWindow.focus(); // 放置焦点要操作contentWindow
+					this.doc.execCommand(name, false, arg);
+				} catch (e) {}
+			},
+
+			/**
+			 * 设置文本
+			 */
+			setText: function(){
+				var _this = this,
+					text  = _this.editorBox.html();
+					
+				trigger.val(text)
+					   .css({width:width - 10, height:height - _this.toolHeight - 10, border:'0', padding:'5px'})
+			},
+			
+			/**
+			 * 创建工具条
+			 */
+			createTool: function(){
+				var _this = this,
+					html = '',
+					len  = data.length,
+					i    = 0;
+				html += '<div class="l-ui-editor-tool fn-clear">';
+				for(; i < len; i++){
+					html += '<a href="javascript:;" title="'+ data[i].title +'"><span class="l-ui-editor-toolIco l-ui-editor-toolIco-'+ data[i].name +'" name="'+ data[i].name +'"></span></a>';
+				}
+				html += '</div>';
+				wrap.prepend(html);
+				_this.toolHeight = wrap.find('.l-ui-editor-tool').outerHeight();
+			},
+
+			/**
+			 * 创建空白iframe
+			 */
+			createIframe : function () {
+				var _this = this;
+
+				_this.iframe = wrap.append('<iframe class="l-ui-editor-iframe" src="javascript:;" frameborder="0"></iframe>')
+								   .find('.l-ui-editor-iframe')
+								   .css({width:width, height:height - _this.toolHeight});
+								   
+				trigger.css({width:width, height:height - _this.toolHeight, border:'0 none'});
+
+				_this.ifr = _this.iframe[0];
+				_this.win = _this.ifr.contentWindow,
+				_this.doc = _this.ifr.contentDocument || _this.win.document; // W3C || IE
+				_this.doc.open();
+				_this.doc.write('<html><body style="margin:0;padding:5px;" contenteditable="true" designMode="on">'+ text +'</body></html>');
+				_this.doc.close();
+
+				_this.editorBox = $(_this.doc).find('body');
+			}
+		};
+	editor.init()
+};
 
 /**
  * 懒加载
@@ -1491,7 +2978,7 @@ zUI.app.lazyload = function(e){
 	$(window).bind("scroll", function () {
 		g();
 	});
-}
+};
 
 /**
  * grid插件
@@ -1504,7 +2991,7 @@ zUI.app.lazyload = function(e){
  * @update 2013.07.24
  * @example 
 	zUI.ui.grid({
-		wrap:'#wrap',
+		wrap:'#main',
 		data: AllOrdersData,
 		columns: [
 			{ display: '表头0', name: 'OrderID', width: 120, render: function(rdata, rindex, value){
@@ -2058,7 +3545,7 @@ zUI.ui.BaseGrid = function(){
 	* @return {Object} zUI.ui.BaseGrid
 	*/
 	this.reflash = function(data, index, cache){
-		var options   = g.o,
+		var options   = g.o,                       //全局数据源
 			columns   = options.columns || {},
 			wrap      = $(options.wrap),
 			id        = options.id,
@@ -2087,7 +3574,8 @@ zUI.ui.BaseGrid = function(){
 					star++;
 				}
 			}
-
+			
+			/*修改全局数据源中的成员*/
 			options.pageIndex = index;
 			options.data.Rows = arr;
 			options.cache[index] = true;
@@ -2098,7 +3586,7 @@ zUI.ui.BaseGrid = function(){
 			if(index){
 				options.pageIndex = index;
 			}
-			options.data = data;
+			options.data = data; //覆盖全局数据源中的data成员
 			tBodyHtml = _core.tBodyFn(options);
 			gridBody.html(tBodyHtml);
 		}
@@ -2140,17 +3628,17 @@ zUI.ui.BaseGrid = function(){
 		return data;
 	};
 	
-}
+};
 
 /**
- * grid实例
+ * grid实例化
  * @dest 封装在zUI.ui.grid里，可创建多个zUI.ui.grid，又避免多个表格this互相影响
  */
 zUI.ui.grid = function(options){
 	var grid = new zUI.ui.BaseGrid();
 	grid.init(options);
 	return grid;
-}
+};
 //zUI.ui.BaseGrid = new zUI.ui.BaseGrid();
 //zUI.ui.grid = zUI.ui.BaseGrid.init;
 

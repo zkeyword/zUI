@@ -1,0 +1,26 @@
+@charset "utf-8";
+/**
+* @Author:      norion
+* @Update:      2013.01.03
+* @Update by:   norion
+* @overview:    switchable 轮播切换
+*/
+
+#switchable-demo1{height:20px;overflow:hidden;}
+	#switchable-demo1 ul{height:20px}
+		#switchable-demo1 li{height:20px;line-height:20px;float:left;}
+		
+#slidesWrap{width:300px;height:300px;overflow:hidden;float:left;position:relative;background:#ddd}
+	#slides{position:absolute;left:0}
+		#slides li{position:relative;height:300px;width:300px;}
+			#slides .slidesPic-font{display:block;width:280px;height:42px;position:absolute;bottom:0;left:0;background:#000;filter:Alpha(opacity=50);opacity:0.50;padding:10px;color:#fff}
+	
+	/*数字按钮*/
+	.l-ui-slidesBtn{position:absolute;right:5px;bottom:5px}
+		.l-ui-slidesBtn li{float:left;margin:0 0 0 5px;padding:0 6px;border:1px solid #fff;background:#fff;color:#000;opacity:0.50;border-radius:10px;font-size:12px}
+			.l-ui-slidesBtn li.on{background:#000;color:#fff;font-size:14px}
+	
+	.l-ui-slidesArrow{position:absolute;width:100%;top:50%}
+		.l-ui-slidesArrow-btn{background:#fff;width:30px;height:30px;position:absolute;}
+			.l-ui-slidesArrow-left{left:0}
+			.l-ui-slidesArrow-right{right:0}

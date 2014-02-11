@@ -1,0 +1,13 @@
+﻿@charset "utf-8";
+/**
+* @Author:      norion
+* @Update:      2012.12.26
+* @Update by:   norion
+* @overview:    邮箱提示
+*/
+
+.l-app-emailsuggestWrap{float:left;position:relative;}
+	.l-app-emailsuggestList{position:absolute;display:none;overflow:hidden;left:0}
+		.l-app-emailsuggestList ul{border:1px solid #d0d0d0;background:#fff}
+			.l-app-emailsuggestList li{padding:2px 5px}
+			.l-app-emailsuggestList li.current{background:#f1f1f1}
