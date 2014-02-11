@@ -1,5 +1,4 @@
 zui 一个简洁的 jquery ui 库
-
 ===
 zui 是基于jquery开发的，目前为止有一些最常见的组件诸如 Drag(对话框)、Switchable(轮播)、Lazyload(延迟加载)、Dialog(对话框)等等，后续还会继续开发更多的常用组件。
 
